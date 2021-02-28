@@ -12,6 +12,16 @@ import io.hotmoka.nodes.views.InitializedNode;
 import io.hotmoka.nodes.views.NodeWithAccounts;
 import io.hotmoka.nodes.views.NodeWithJars;
 
+/**
+ * Go inside the hotmoka project, run
+ * 
+ * . set_variables.sh
+ * 
+ * then move inside this project and run
+ * 
+ * mvn clean package
+ * java --module-path $explicit:$automatic:target/blockchain-0.0.1-SNAPSHOT.jar -classpath $unnamed"/*" --module blockchain/io.takamaka.family.Main
+ */
 public class Main {
   public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(100_000_000);
   public final static BigInteger RED_AMOUNT = BigInteger.ZERO;
