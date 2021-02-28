@@ -6,15 +6,21 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPair;
+import java.util.Base64;
 
 import io.hotmoka.beans.references.TransactionReference;
+import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest.Signer;
 import io.hotmoka.beans.signatures.CodeSignature;
+import io.hotmoka.beans.signatures.ConstructorSignature;
+import io.hotmoka.beans.types.ClassType;
 import io.hotmoka.beans.values.BigIntegerValue;
 import io.hotmoka.beans.values.StorageReference;
+import io.hotmoka.beans.values.StringValue;
 import io.hotmoka.crypto.SignatureAlgorithm;
 import io.hotmoka.memory.MemoryBlockchain;
 import io.hotmoka.memory.MemoryBlockchainConfig;
@@ -84,10 +90,41 @@ public class Main {
           Files.readAllBytes(familyPath), // bytes of the jar to install
           takamakaCode)); // dependencies of the jar that is being installed
 
+      // we increase to nonce, ready for further transactions having the gamete as payer
+      nonce = nonce.add(ONE);
+
+      // create a new public/private key pair to control the new account
+      KeyPair keys = signature.getKeyPair();
+
+      // transform the public key in string, Base64 encoded
+      String publicKey = Base64.getEncoder().encodeToString
+        (keys.getPublic().getEncoded());
+
+   	  // call constructor io.takamaka.code.lang.ExternallyOwnedAccount
+      // with arguments (BigInteger funds, String publicKey)
+      StorageReference account = node
+        .addConstructorCallTransaction(new ConstructorCallTransactionRequest
+          (signerOnBehalfOfGamete, // an object that signs with the payer's private key
+           gamete, // payer
+           nonce, // nonce of the payer, relevant
+           "", // chain identifier, relevant
+           BigInteger.valueOf(10_000), // gas limit: enough for the creation of an account
+           gasHelper.getSafeGasPrice(), // gas price
+           takamakaCode, // class path for the execution of the transaction
+
+           // signature of the constructor to call
+           new ConstructorSignature("io.takamaka.code.lang.ExternallyOwnedAccount",
+             ClassType.BIG_INTEGER, ClassType.STRING),
+
+           // actual arguments passed to the constructor:
+           // we fund it with 100,000 units of green coin
+           new BigIntegerValue(BigInteger.valueOf(100_000)), new StringValue(publicKey)));
+
       System.out.println("manifest: " + node.getManifest());
       System.out.println("gamete: " + gamete);
       System.out.println("nonce of gamete: " + nonce);
       System.out.println("family-0.0.1-SNAPSHOT.jar: " + family);
+      System.out.println("account: " + account);
 
       // we increase to nonce, ready for further transactions having the gamete as payer
       nonce = nonce.add(ONE);
