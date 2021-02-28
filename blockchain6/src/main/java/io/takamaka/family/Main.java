@@ -9,11 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
+import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest.Signer;
 import io.hotmoka.beans.signatures.ConstructorSignature;
+import io.hotmoka.beans.signatures.NonVoidMethodSignature;
 import io.hotmoka.beans.types.ClassType;
 import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
+import io.hotmoka.beans.values.StorageValue;
 import io.hotmoka.beans.values.StringValue;
 import io.hotmoka.memory.MemoryBlockchain;
 import io.hotmoka.memory.MemoryBlockchainConfig;
@@ -39,7 +42,7 @@ public class Main {
       ("../../hotmoka/modules/explicit/io-takamaka-code-1.0.0.jar");
 
     // the path of the user jar to install
-    Path familyPath = Paths.get("../family_storage/target/family-0.0.1-SNAPSHOT.jar");
+    Path familyPath = Paths.get("../family_exported/target/family-0.0.1-SNAPSHOT.jar");
 
     try (Node node = MemoryBlockchain.init(config, consensus)) {
       // first view: store io-takamaka-code-1.0.0.jar and create manifest and gamete
@@ -95,12 +98,40 @@ public class Main {
           new IntValue(4), new IntValue(1879)
       ));
 
-      System.out.println("manifest: " + node.getManifest());
-      System.out.println("family-0.0.1-SNAPSHOT.jar: " + nodeWithJars.jar(0));
-      System.out.println("account #0: " + nodeWithAccounts.account(0) +
-                         "\n  with private key " + nodeWithAccounts.privateKey(0));
-      System.out.println("account #1: " + nodeWithAccounts.account(1) +
-                         "\n  with private key " + nodeWithAccounts.privateKey(1));
+      StorageValue s = node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest(
+
+        // signer on behalf of the second account
+        Signer.with(node.getSignatureAlgorithmForRequests(), nodeWithAccounts.privateKey(1)),
+
+        // the second account pays for the transaction
+        nodeWithAccounts.account(1),
+
+        // nonce: we know this is the first transaction
+        // with nodeWithAccounts.account(1)
+        ZERO,
+ 
+        // chain identifier
+        "",
+
+        // gas provided to the transaction
+        BigInteger.valueOf(10_000),
+
+        // gas price
+        panarea(gasHelper.getSafeGasPrice()),
+
+        // reference to family-0.0.1-SNAPSHOT.jar
+        // and its dependency io-takamaka-code-1.0.0.jar
+        nodeWithJars.jar(0),
+
+        // method to call: String Person.toString()
+        new NonVoidMethodSignature(PERSON, "toString", ClassType.STRING),
+
+        // receiver of the method to
+        albert
+      ));
+
+      // print the result of the call
+      System.out.println(s);
     }
   }
 }
