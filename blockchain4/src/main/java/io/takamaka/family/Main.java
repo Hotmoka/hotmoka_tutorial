@@ -20,7 +20,7 @@ import io.hotmoka.nodes.views.NodeWithJars;
  * then move inside this project and run
  * 
  * mvn clean package
- * java --module-path $explicit:$automatic:target/blockchain-0.0.1-SNAPSHOT.jar -classpath $unnamed"/*" --module blockchain/io.takamaka.family.Main
+ * java --module-path $explicit:$automatic:target/blockchain4-0.0.1-SNAPSHOT.jar -classpath $unnamed"/*" --module blockchain/io.takamaka.family.Main
  */
 public class Main {
   public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(100_000_000);

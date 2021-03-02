@@ -1,31 +1,31 @@
-I[2021-02-28|19:29:09.485] Version info                                 module=main software=0.32.11 block=10 p2p=7
-I[2021-02-28|19:29:09.620] Starting Node                                module=main impl=Node
-I[2021-02-28|19:29:09.797] Started node                                 module=main nodeInfo="{ProtocolVersion:{P2P:7 Block:10 App:0} ID_:9d627c83c12cc84e33dfd91540d81da5fdbc8a7d ListenAddr:tcp://0.0.0.0:26656 Network:test-chain-EpiTJk Version:0.32.11 Channels:4020212223303800 Moniker:penelope Other:{TxIndex:on RPCAddress:tcp://127.0.0.1:26657}}"
-I[2021-02-28|19:29:15.619] Executed block                               module=state height=1 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:15.687] Committed state                              module=state height=1 txs=1 appHash=DA5B85E474CEAED58412C090D970A7979925493C1003C75884C4133341EB1076
-I[2021-02-28|19:29:16.458] Executed block                               module=state height=2 validTxs=0 invalidTxs=0
-I[2021-02-28|19:29:16.518] Committed state                              module=state height=2 txs=0 appHash=32117EB263DB57A5780D227B72D288A6F6545477A9D9BF2E341061D436401BEA
-I[2021-02-28|19:29:17.959] Executed block                               module=state height=3 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:18.018] Committed state                              module=state height=3 txs=1 appHash=956A62935DC613865BCC9FC1C1B3BA367242DBEF51628CFCA7017D042F312CC8
-I[2021-02-28|19:29:19.403] Executed block                               module=state height=4 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:19.519] Committed state                              module=state height=4 txs=1 appHash=B816D9C3B4E2BC490086A68939F460BF78EBFD9F6DD4A1BE973E7608D2C30283
-I[2021-02-28|19:29:21.015] Executed block                               module=state height=5 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:21.077] Committed state                              module=state height=5 txs=1 appHash=AECBE4D39F212A1F2426AC45A111EC1C26F782DFFEF4F1278C2B4DCB1261A379
-I[2021-02-28|19:29:22.571] Executed block                               module=state height=6 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:22.641] Committed state                              module=state height=6 txs=1 appHash=5A4A3CD5CF6D76F54C775BB0718B9396F86090983864C61C4A7524B0DC60F5E9
-I[2021-02-28|19:29:24.085] Executed block                               module=state height=7 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:24.146] Committed state                              module=state height=7 txs=1 appHash=FDC5F07E33C75D8D06202B50E3AA929D737923C56C48E69E5DD6E5AF776E59CF
-I[2021-02-28|19:29:25.782] Executed block                               module=state height=8 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:25.826] Committed state                              module=state height=8 txs=1 appHash=45BFBE884B1B60104C6104298FFD929C151D52EFA9078EAC5BBBA01DBD3CBC36
-I[2021-02-28|19:29:26.952] Executed block                               module=state height=9 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:27.056] Committed state                              module=state height=9 txs=1 appHash=3071BD01A0A521822A2332FFDF0EEBDFB918E1340CB8B735D00A4C816299EA89
-I[2021-02-28|19:29:28.472] Executed block                               module=state height=10 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:28.539] Committed state                              module=state height=10 txs=1 appHash=2ED8369BB7C5A27E985D20F101E81E6C43C05E210E985374EB94D2390CDA7445
-I[2021-02-28|19:29:29.913] Executed block                               module=state height=11 validTxs=1 invalidTxs=0
-I[2021-02-28|19:29:30.040] Committed state                              module=state height=11 txs=1 appHash=40523D77A98D797ED8545B6BE170A15BB3B6F6CFD43F7E0DC0AFC95E1707515B
-I[2021-02-28|19:29:30.260] captured terminated, exiting...              module=main 
-I[2021-02-28|19:29:30.260] Stopping Node                                module=main impl=Node
-I[2021-02-28|19:29:30.260] Stopping Node                                module=main 
-E[2021-02-28|19:29:30.260] Not stopping BlockPool -- have not been started yet module=blockchain impl=BlockPool
-E[2021-02-28|19:29:30.317] Stopped accept routine, as transport is closed module=p2p numPeers=0
-I[2021-02-28|19:29:30.317] Closing rpc listener                         module=main listener="&{Listener:0xc000524d00 sem:0xc0001cad20 closeOnce:{done:0 m:{state:0 sema:0}} done:0xc0001cad80}"
+I[2021-03-02|12:23:09.301] Version info                                 module=main software=0.32.11 block=10 p2p=7
+I[2021-03-02|12:23:09.311] Starting Node                                module=main impl=Node
+I[2021-03-02|12:23:09.317] Started node                                 module=main nodeInfo="{ProtocolVersion:{P2P:7 Block:10 App:0} ID_:081a3e95e17946e25441327fbca5ec0ba5a53a87 ListenAddr:tcp://0.0.0.0:26656 Network:test-chain-X7JYZg Version:0.32.11 Channels:4020212223303800 Moniker:filicudi Other:{TxIndex:on RPCAddress:tcp://127.0.0.1:26657}}"
+I[2021-03-02|12:23:13.439] Executed block                               module=state height=1 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:13.466] Committed state                              module=state height=1 txs=1 appHash=1BFCC66EB937EFBB8157CC7F20143DC4A2089FC2ABC7C898D033EC5E3E78E47F
+I[2021-03-02|12:23:13.512] Executed block                               module=state height=2 validTxs=0 invalidTxs=0
+I[2021-03-02|12:23:13.528] Committed state                              module=state height=2 txs=0 appHash=D2CCF33273A4C092F38AE247CF28218715264B51C83D8D817955B6D1F9265609
+I[2021-03-02|12:23:14.581] Executed block                               module=state height=3 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:14.588] Committed state                              module=state height=3 txs=1 appHash=7929CB9C3204DEFB25799E6828522F6E98E84A941AB64FFBD6622DD702A56648
+I[2021-03-02|12:23:15.600] Executed block                               module=state height=4 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:15.610] Committed state                              module=state height=4 txs=1 appHash=022992D4814F48FEB859C7EA853EF0893ADE829D7D3E011C92B1194785D0702F
+I[2021-03-02|12:23:16.639] Executed block                               module=state height=5 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:16.647] Committed state                              module=state height=5 txs=1 appHash=0DC6133DE3BC195F323F9A1A467F8716AAA723669664932379A111D308E1A6A5
+I[2021-03-02|12:23:17.760] Executed block                               module=state height=6 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:17.769] Committed state                              module=state height=6 txs=1 appHash=A7100590BB3B418357CBBD7CBE436DBB3924FF52DD4B1052FF4F88C26ACC969D
+I[2021-03-02|12:23:18.813] Executed block                               module=state height=7 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:18.825] Committed state                              module=state height=7 txs=1 appHash=F69331D8F45930926826730A4B3CB82DEB1AAE9B3ECFDF16789BAEC250E0685B
+I[2021-03-02|12:23:19.868] Executed block                               module=state height=8 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:19.879] Committed state                              module=state height=8 txs=1 appHash=CA3F0676A68FCE04A7DEA19D07DE1913E3158E132ECFDF4AF5A0D93D16B3A5FF
+I[2021-03-02|12:23:20.836] Executed block                               module=state height=9 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:20.847] Committed state                              module=state height=9 txs=1 appHash=261542EE7FA591C83A5427040EC4F9D0C5E3D26C8E00FBFDA31B9B0F45D7861F
+I[2021-03-02|12:23:21.851] Executed block                               module=state height=10 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:21.857] Committed state                              module=state height=10 txs=1 appHash=1440F99BB173639395756A87523B27519F54ECE2B4EA0BC47307D3A0194CCB8D
+I[2021-03-02|12:23:22.871] Executed block                               module=state height=11 validTxs=1 invalidTxs=0
+I[2021-03-02|12:23:22.878] Committed state                              module=state height=11 txs=1 appHash=734708DD6CDCE08A3E6FC6EDCE30AFC3A1D9C51C0EDA1C0B7F86A4B6CABF9E24
+I[2021-03-02|12:23:22.917] captured terminated, exiting...              module=main 
+I[2021-03-02|12:23:22.917] Stopping Node                                module=main impl=Node
+I[2021-03-02|12:23:22.917] Stopping Node                                module=main 
+E[2021-03-02|12:23:22.917] Not stopping BlockPool -- have not been started yet module=blockchain impl=BlockPool
+E[2021-03-02|12:23:22.920] Stopped accept routine, as transport is closed module=p2p numPeers=0
+I[2021-03-02|12:23:22.920] Closing rpc listener                         module=main listener="&{Listener:0xc00000d880 sem:0xc000554e40 closeOnce:{done:0 m:{state:0 sema:0}} done:0xc000554ea0}"
