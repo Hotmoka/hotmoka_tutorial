@@ -2,6 +2,8 @@ target/
 .classpath
 .settings/
 chain/
+hotmoka.log
+tendermint.log
 .project
 pom.xml.tag
 pom.xml.releaseBackup
