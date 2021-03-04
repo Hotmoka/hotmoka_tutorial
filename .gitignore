@@ -2,6 +2,7 @@ target/
 .classpath
 .settings/
 chain/
+instrumented/
 hotmoka.log
 tendermint.log
 .project
