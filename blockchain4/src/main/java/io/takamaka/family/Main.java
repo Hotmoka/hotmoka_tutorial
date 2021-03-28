@@ -41,7 +41,7 @@ import io.hotmoka.nodes.views.NodeWithJars;
  * java --module-path $explicit:$automatic:target/blockchain4-0.0.1-SNAPSHOT.jar -classpath $unnamed"/*" --module blockchain/io.takamaka.family.Main
  */
 public class Main {
-  public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(100_000_000);
+  public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(1_000_000_000);
   public final static BigInteger RED_AMOUNT = BigInteger.ZERO;
 
   public static void main(String[] args) throws Exception {

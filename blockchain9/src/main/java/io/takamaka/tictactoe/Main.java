@@ -66,7 +66,7 @@ public class Main {
   private final static BigInteger _1_000_000_000 = BigInteger.valueOf(1_000_000_000);
   public final static BigInteger GREEN_AMOUNT = _1_000_000_000.multiply(_1_000_000_000);
   public final static BigInteger RED_AMOUNT = ZERO;
-  private final static BigInteger _50_000 = BigInteger.valueOf(50_000L);
+  private final static BigInteger _100_000 = BigInteger.valueOf(100_000L);
   private final static ClassType TIC_TAC_TOE
     = new ClassType("io.takamaka.tictactoe.TicTacToe");
 
@@ -115,7 +115,7 @@ public class Main {
           creator, // payer of the transaction
           ZERO, // nonce of the payer
           "", // chain identifier
-          _50_000, // gas provided to the transaction
+          BigInteger.valueOf(500_000L), // gas provided to the transaction
           panarea(gasHelper.getSafeGasPrice()), // gas price
           classpath,
           new ConstructorSignature(TIC_TAC_TOE))); /// TicTacToe()
@@ -126,7 +126,7 @@ public class Main {
         player1, // payer
         ZERO, // nonce of the payer
         "", // chain identifier
-        _50_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
 
@@ -142,7 +142,7 @@ public class Main {
         player2, // this account pays for the transaction
         ZERO, // nonce of the payer
         "", // chain identifier
-        _50_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         TIC_TAC_TOE_PLAY, // void TicTacToe.play(long, int, int)
@@ -155,7 +155,7 @@ public class Main {
         player1, // this account pays for the transaction
         ONE, // nonce of the payer
         "", // chain identifier
-        _50_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         TIC_TAC_TOE_PLAY, // method to call
@@ -168,7 +168,7 @@ public class Main {
         player2, // this account pays for the transaction
         ONE, // nonce of the payer
         "", // chain identifier
-        _50_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         TIC_TAC_TOE_PLAY, // method to call
@@ -181,7 +181,7 @@ public class Main {
         player1, // this account pays for the transaction
         TWO, // nonce of the payer
         "", // chain identifier
-        _50_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         TIC_TAC_TOE_PLAY, // method to call
@@ -195,7 +195,7 @@ public class Main {
           player1, // this account pays for the transaction
           BigInteger.valueOf(3), // nonce of the payer
           "", // chain identifier
-          _50_000, // gas provided to the transaction
+          _100_000, // gas provided to the transaction
           panarea(gasHelper.getSafeGasPrice()), // gas price
           classpath,
 
@@ -212,7 +212,7 @@ public class Main {
         player2, // this account pays for the transaction
         TWO, // nonce of the payer
         "", // chain identifier
-        _50_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         TIC_TAC_TOE_PLAY, // void TicTacToe.play(long, int, int)

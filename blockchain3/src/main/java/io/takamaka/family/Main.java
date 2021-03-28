@@ -58,7 +58,7 @@ import io.hotmoka.nodes.views.InitializedNode;
  * java --module-path $explicit:$automatic:target/blockchain3-0.0.1-SNAPSHOT.jar -classpath $unnamed"/*" --module blockchain/io.takamaka.family.Main
  */
 public class Main {
-  public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(100_000_000);
+  public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(1_000_000_000);
   public final static BigInteger RED_AMOUNT = BigInteger.ZERO;
 
   public static void main(String[] args) throws Exception {
@@ -97,7 +97,7 @@ public class Main {
       BigInteger nonce = ((BigIntegerValue) node
         .runInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
           (gamete, // payer
-          BigInteger.valueOf(10_000), // gas limit
+          BigInteger.valueOf(50_000), // gas limit
           takamakaCode, // class path for the execution of the transaction
           CodeSignature.NONCE, // method
           gamete))) // receiver of the method call
@@ -112,7 +112,7 @@ public class Main {
           gamete, // payer
           nonce, // payer's nonce: relevant since this is not a call to a @View method!
           "", // chain identifier: relevant since this is not a call to a @View method!
-          BigInteger.valueOf(10_000), // gas limit: enough for this very small jar
+          BigInteger.valueOf(300_000), // gas limit: enough for this very small jar
           gasHelper.getSafeGasPrice(), // gas price: at least the current gas price of the network
           takamakaCode, // class path for the execution of the transaction
           Files.readAllBytes(familyPath), // bytes of the jar to install
@@ -136,7 +136,7 @@ public class Main {
            gamete, // payer
            nonce, // nonce of the payer, relevant
            "", // chain identifier, relevant
-           BigInteger.valueOf(10_000), // gas limit: enough for the creation of an account
+           BigInteger.valueOf(50_000), // gas limit: enough for the creation of an account
            gasHelper.getSafeGasPrice(), // gas price
            takamakaCode, // class path for the execution of the transaction
 

@@ -60,7 +60,7 @@ public class Main {
   private final static BigInteger _1_000_000_000 = BigInteger.valueOf(1_000_000_000);
   public final static BigInteger GREEN_AMOUNT = _1_000_000_000.multiply(_1_000_000_000);
   public final static BigInteger RED_AMOUNT = ZERO;
-  private final static BigInteger _10_000 = BigInteger.valueOf(10_000);
+  private final static BigInteger _100_000 = BigInteger.valueOf(100_000);
   private final static ClassType GRADUAL_PONZI
     = new ClassType("io.takamaka.ponzi.GradualPonzi");
   private final static VoidMethodSignature gradualPonziInvest
@@ -101,7 +101,7 @@ public class Main {
           player1, // player1 pays for the transaction
           ZERO, // nonce for player1
           "", // chain identifier
-          _10_000, // gas provided to the transaction
+          _100_000, // gas provided to the transaction
           panarea(gasHelper.getSafeGasPrice()), // gas price
           classpath,
           new ConstructorSignature(GRADUAL_PONZI))); /// GradualPonzi()
@@ -112,7 +112,7 @@ public class Main {
         player2, // player2 pays for the transaction
         ZERO, // nonce for player2
         "", // chain identifier
-        _10_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         gradualPonziInvest, // method void GradualPonzi.invest(BigInteger)
@@ -125,7 +125,7 @@ public class Main {
         player3, // player3 pays for the transaction
         ZERO, // nonce of player3
         "", // chain identifier
-        _10_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         gradualPonziInvest, // method void GradualPonzi.invest(BigInteger)
@@ -138,7 +138,7 @@ public class Main {
         player1, // player1 pays for the transaction
      	ONE, // nonce of player1
         "", // chain identifier
-        _10_000, // gas provided to the transaction
+        _100_000, // gas provided to the transaction
         panarea(gasHelper.getSafeGasPrice()), // gas price
         classpath,
         gradualPonziInvest, // method void GradualPonzi.invest(BigInteger)

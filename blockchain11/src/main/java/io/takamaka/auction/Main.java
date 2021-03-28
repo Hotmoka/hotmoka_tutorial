@@ -85,7 +85,7 @@ public class Main {
     _1_000_000_000.multiply(_10_000);
   public final static BigInteger GREEN_AMOUNT = _1_000_000_000.multiply(_1_000_000_000);
   public final static BigInteger RED_AMOUNT = ZERO;
-  private final static BigInteger _100_000 = BigInteger.valueOf(100_000);
+  private final static BigInteger _500_000 = BigInteger.valueOf(500_000);
 
   // useful constants that refer to classes, constructors or methods
   private final static ClassType BLIND_AUCTION
@@ -155,7 +155,7 @@ public class Main {
     private StorageReference intoBlockchain() throws Exception {
       StorageReference bytes32 = node.addConstructorCallTransaction(new ConstructorCallTransactionRequest
         (signers[player], node.account(player),
-        getNonceAndIncrement(player), "",_100_000,
+        getNonceAndIncrement(player), "", _500_000,
         panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
     	new ByteValue(salt[0]), new ByteValue(salt[1]), new ByteValue(salt[2]), new ByteValue(salt[3]),
     	new ByteValue(salt[4]), new ByteValue(salt[5]), new ByteValue(salt[6]), new ByteValue(salt[7]),
@@ -169,7 +169,7 @@ public class Main {
       return node.addConstructorCallTransaction(new ConstructorCallTransactionRequest
         (signers[player], node.account(player),
          getNonceAndIncrement(player), "",
-         _10_000, panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_REVEALED_BID,
+         _500_000, panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_REVEALED_BID,
          new BigIntegerValue(value), new BooleanValue(fake), bytes32));
     }
   }
@@ -199,7 +199,7 @@ public class Main {
     // create the auction contract in the store of the node
     this.auction = node.addConstructorCallTransaction
       (new ConstructorCallTransactionRequest(signers[0], node.account(0),
-       getNonceAndIncrement(0), "", _10_000, panarea(gasHelper.getSafeGasPrice()),
+       getNonceAndIncrement(0), "", _500_000, panarea(gasHelper.getSafeGasPrice()),
        classpath, CONSTRUCTOR_BLIND_AUCTION,
        new IntValue(BIDDING_TIME), new IntValue(REVEAL_TIME)));
 
@@ -257,7 +257,7 @@ private StorageReference placeBids() throws Exception {
       node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
         (signers[player], node.account(player),
          getNonceAndIncrement(player), "",
-         _100_000, panarea(gasHelper.getSafeGasPrice()), classpath, BID,
+         _500_000, panarea(gasHelper.getSafeGasPrice()), classpath, BID,
          auction, new BigIntegerValue(deposit), bytes32));
 
       i++;
@@ -277,7 +277,7 @@ private StorageReference placeBids() throws Exception {
       int player = it.next().player;
       node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
         (signers[player], node.account(player),
-        getNonceAndIncrement(player), "", _10_000,
+        getNonceAndIncrement(player), "", _500_000,
         panarea(gasHelper.getSafeGasPrice()),
         classpath, REVEAL, auction, bidInStore));
     }
@@ -287,7 +287,7 @@ private StorageReference placeBids() throws Exception {
     StorageValue winner = node.addInstanceMethodCallTransaction
       (new InstanceMethodCallTransactionRequest
       (signers[0], node.account(0), getNonceAndIncrement(0),
-      "", _10_000, panarea(gasHelper.getSafeGasPrice()),
+      "", _500_000, panarea(gasHelper.getSafeGasPrice()),
       classpath, AUCTION_END, auction));
 
     // the winner is normally a StorageReference,
@@ -346,7 +346,7 @@ private StorageReference placeBids() throws Exception {
         signers[player],
         node.account(player),
         getNonceAndIncrement(player), "",
-        _100_000, panarea(gasHelper.getSafeGasPrice()),
+        _500_000, panarea(gasHelper.getSafeGasPrice()),
         classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
         new ByteValue(hash[0]), new ByteValue(hash[1]),
         new ByteValue(hash[2]), new ByteValue(hash[3]),
