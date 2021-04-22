@@ -53,15 +53,16 @@ import io.hotmoka.beans.values.ByteValue;
 import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StorageValue;
-import io.hotmoka.crypto.SignatureAlgorithm;
+import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.beans.SignatureAlgorithm;
 import io.hotmoka.memory.MemoryBlockchain;
 import io.hotmoka.memory.MemoryBlockchainConfig;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.GasHelper;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.views.InitializedNode;
-import io.hotmoka.nodes.views.NodeWithAccounts;
-import io.hotmoka.nodes.views.NodeWithJars;
+import io.hotmoka.views.InitializedNode;
+import io.hotmoka.views.NodeWithAccounts;
+import io.hotmoka.views.NodeWithJars;
 
 /**
  * Go inside the hotmoka project, run
@@ -187,7 +188,7 @@ public class Main {
        _10_000_000_000_000, _10_000_000_000_000, _10_000_000_000_000, _10_000_000_000_000);
 
     SignatureAlgorithm<SignedTransactionRequest> signature
-      = emptyNode.getSignatureAlgorithmForRequests();
+      = SignatureAlgorithmForTransactionRequests.mk(emptyNode.getNameOfSignatureAlgorithmForRequests());  
     this.gasHelper = new GasHelper(node);
 
     for (int pos = 0; pos < 4; pos++)

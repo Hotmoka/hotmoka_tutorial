@@ -39,13 +39,14 @@ import io.hotmoka.beans.types.ClassType;
 import io.hotmoka.beans.values.BigIntegerValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StringValue;
-import io.hotmoka.crypto.SignatureAlgorithm;
+import io.hotmoka.beans.SignatureAlgorithm;
+import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.memory.MemoryBlockchain;
 import io.hotmoka.memory.MemoryBlockchainConfig;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.GasHelper;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.views.InitializedNode;
+import io.hotmoka.views.InitializedNode;
 
 /**
  * Go inside the hotmoka project, run
@@ -85,7 +86,7 @@ public class Main {
 
       // we get the signing algorithm to use for requests
       SignatureAlgorithm<SignedTransactionRequest> signature
-        = node.getSignatureAlgorithmForRequests();
+        = SignatureAlgorithmForTransactionRequests.mk(node.getNameOfSignatureAlgorithmForRequests());
 
       // we create a signer that signs with the private key of the gamete
       Signer signerOnBehalfOfGamete = Signer.with

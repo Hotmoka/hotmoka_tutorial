@@ -36,12 +36,13 @@ import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StorageValue;
 import io.hotmoka.beans.values.StringValue;
+import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.GasHelper;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.views.InitializedNode;
-import io.hotmoka.nodes.views.NodeWithAccounts;
-import io.hotmoka.nodes.views.NodeWithJars;
+import io.hotmoka.views.InitializedNode;
+import io.hotmoka.views.NodeWithAccounts;
+import io.hotmoka.views.NodeWithJars;
 import io.hotmoka.tendermint.TendermintBlockchain;
 import io.hotmoka.tendermint.TendermintBlockchainConfig;
 
@@ -94,7 +95,8 @@ public class Main {
         (new ConstructorCallTransactionRequest(
 
           // signer on behalf of the first account
-          Signer.with(node.getSignatureAlgorithmForRequests(),
+          Signer.with(SignatureAlgorithmForTransactionRequests.mk
+            (node.getNameOfSignatureAlgorithmForRequests()),
             nodeWithAccounts.privateKey(0)),
 
           // the first account pays for the transaction
@@ -128,7 +130,9 @@ public class Main {
       StorageValue s = node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest(
 
         // signer on behalf of the second account
-        Signer.with(node.getSignatureAlgorithmForRequests(), nodeWithAccounts.privateKey(1)),
+        Signer.with(SignatureAlgorithmForTransactionRequests.mk
+    	  (node.getNameOfSignatureAlgorithmForRequests()),
+    	  nodeWithAccounts.privateKey(1)),
 
         // the second account pays for the transaction
         nodeWithAccounts.account(1),

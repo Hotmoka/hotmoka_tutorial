@@ -26,7 +26,7 @@ import io.hotmoka.memory.MemoryBlockchain;
 import io.hotmoka.memory.MemoryBlockchainConfig;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.views.InitializedNode;
+import io.hotmoka.views.InitializedNode;
 
 /**
  * Go inside the hotmoka project, run

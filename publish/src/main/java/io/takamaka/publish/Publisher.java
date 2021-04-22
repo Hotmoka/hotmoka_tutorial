@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.views.InitializedNode;
+import io.hotmoka.views.InitializedNode;
 import io.hotmoka.service.NodeService;
 import io.hotmoka.service.NodeServiceConfig;
 import io.hotmoka.tendermint.TendermintBlockchain;

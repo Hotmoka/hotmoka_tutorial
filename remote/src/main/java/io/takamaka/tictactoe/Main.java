@@ -42,13 +42,14 @@ import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.LongValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StringValue;
-import io.hotmoka.crypto.SignatureAlgorithm;
+import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.beans.SignatureAlgorithm;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.GasHelper;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.views.InitializedNode;
-import io.hotmoka.nodes.views.NodeWithAccounts;
-import io.hotmoka.nodes.views.NodeWithJars;
+import io.hotmoka.views.InitializedNode;
+import io.hotmoka.views.NodeWithAccounts;
+import io.hotmoka.views.NodeWithJars;
 import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
 
@@ -104,8 +105,8 @@ public class Main {
       StorageReference creator = nodeWithAccounts.account(0);
       StorageReference player1 = nodeWithAccounts.account(1);
       StorageReference player2 = nodeWithAccounts.account(2);
-	  SignatureAlgorithm<SignedTransactionRequest> signature
-	    = node.getSignatureAlgorithmForRequests();
+      SignatureAlgorithm<SignedTransactionRequest> signature
+        = SignatureAlgorithmForTransactionRequests.mk(node.getNameOfSignatureAlgorithmForRequests());  
 	  Signer signerForCreator = Signer.with(signature, nodeWithAccounts.privateKey(0));
       Signer signerForPlayer1 = Signer.with(signature, nodeWithAccounts.privateKey(1));
       Signer signerForPlayer2 = Signer.with(signature, nodeWithAccounts.privateKey(2));

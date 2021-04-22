@@ -42,11 +42,12 @@ import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.LongValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StringValue;
-import io.hotmoka.crypto.SignatureAlgorithm;
+import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.beans.SignatureAlgorithm;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.GasHelper;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.views.InitializedNode;
+import io.hotmoka.views.InitializedNode;
 import io.hotmoka.tendermint.TendermintBlockchain;
 import io.hotmoka.tendermint.TendermintBlockchainConfig;
 
@@ -80,8 +81,8 @@ public class Main {
         (node, consensus, takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
 
       // get the algorithm for qtesla-p-I signatures
-      SignatureAlgorithm<SignedTransactionRequest> qtesla = SignatureAlgorithm.qtesla1
-        (SignedTransactionRequest::toByteArrayWithoutSignature);
+      SignatureAlgorithm<SignedTransactionRequest> qtesla
+        = SignatureAlgorithmForTransactionRequests.qtesla1();
 
       // create a qtesla keypair
       KeyPair qteslaKeyPair = qtesla.getKeyPair();
@@ -98,7 +99,7 @@ public class Main {
       BigInteger nonce = ((BigIntegerValue) node
         .runInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
           (initialized.gamete(), // payer
-          BigInteger.valueOf(10_000), // gas limit
+          BigInteger.valueOf(20_000), // gas limit
           node.getTakamakaCode(), // class path for the execution of the transaction
           CodeSignature.NONCE, // method
           initialized.gamete()))) // receiver of the method call
@@ -110,12 +111,12 @@ public class Main {
       StorageReference qteslaAccount = node.addConstructorCallTransaction
        (new ConstructorCallTransactionRequest
         // signed with the default algorithm
-        (Signer.with(node.getSignatureAlgorithmForRequests(),
+        (Signer.with(SignatureAlgorithmForTransactionRequests.mk(node.getNameOfSignatureAlgorithmForRequests()),
             initialized.keysOfGamete()),
          initialized.gamete(), // the gamete is the caller
          nonce, // nonce
          "", // chain id
-         BigInteger.valueOf(50_000), // gas amount
+         BigInteger.valueOf(10_000_000), // gas amount: qtesla keys are big!
          panarea(gasHelper.getSafeGasPrice()), // gas cost
          initialized.getTakamakaCode(), // classpath
          // call the constructor of
@@ -141,7 +142,7 @@ public class Main {
          qteslaAccount, // the caller is the qtesla account
          ZERO, // the nonce of the gtesla account
          "", // the chain id
-         BigInteger.valueOf(20_000), // gas amount
+         BigInteger.valueOf(200_000), // gas amount: qtesla signatures are big!
          panarea(gasHelper.getSafeGasPrice()), // gas cost
          initialized.getTakamakaCode(), // classpath
          callee, // the static method to class
