@@ -33,12 +33,12 @@
   <dependencies>
     <dependency>
       <groupId>io.hotmoka</groupId>
-      <artifactId>io-hotmoka-memory</artifactId>
+      <artifactId>io-hotmoka-remote</artifactId>
       <version>1.0.0</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>io.hotmoka</groupId>
-      <artifactId>io-hotmoka-views</artifactId>
+      <artifactId>io-hotmoka-crypto</artifactId>
       <version>1.0.0</version>
     </dependency>
   </dependencies>

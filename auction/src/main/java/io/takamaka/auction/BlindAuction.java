@@ -18,7 +18,6 @@
 
 package io.takamaka.auction;
 
-import static io.takamaka.code.lang.Takamaka.event;
 import static io.takamaka.code.lang.Takamaka.now;
 import static io.takamaka.code.lang.Takamaka.require;
 
