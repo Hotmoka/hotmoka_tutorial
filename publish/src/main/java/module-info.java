@@ -1,4 +1,4 @@
-module blockchain {
+module publish {
   requires io.hotmoka.tendermint;
   requires io.hotmoka.service;
   requires io.hotmoka.beans;

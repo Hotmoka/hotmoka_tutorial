@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package io.takamaka.family;
+package decorators;
 
 import java.math.BigInteger;
 import java.nio.file.Path;
@@ -31,14 +31,10 @@ import io.hotmoka.views.NodeWithAccounts;
 import io.hotmoka.views.NodeWithJars;
 
 /**
- * Go inside the hotmoka project, run
- * 
- * . set_variables.sh
- * 
- * then move inside this project and run
+ * Move inside this project and run
  * 
  * mvn clean package
- * java --module-path $explicit:$automatic:target/blockchain4-0.0.1-SNAPSHOT.jar -classpath $unnamed"/*" --module blockchain/io.takamaka.family.Main
+ * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/decorators-0.0.1-SNAPSHOT.jar -classpath ../../hotmoka/modules/unnamed"/*" --module decorators/decorators.Main
  */
 public class Main {
   public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(1_000_000_000);
@@ -65,8 +61,8 @@ public class Main {
         (node, initialized.gamete(), initialized.keysOfGamete().getPrivate(),
         familyPath);
 
-      // third view: create two accounts, the first with 10,000,000 units of green coin
-      // and the second with 20,000,000 units of green coin
+      // third view: create two accounts, the first with 10,000,000 units of coin
+      // and the second with 20,000,000 units of coin; the gamete will pay
       NodeWithAccounts nodeWithAccounts = NodeWithAccounts.of
         (node, initialized.gamete(), initialized.keysOfGamete().getPrivate(),
         BigInteger.valueOf(10_000_000), BigInteger.valueOf(20_000_000));

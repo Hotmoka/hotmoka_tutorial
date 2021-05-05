@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package io.takamaka.publish;
+package publish;
 
 import static java.math.BigInteger.ZERO;
 
@@ -33,14 +33,10 @@ import io.hotmoka.tendermint.TendermintBlockchain;
 import io.hotmoka.tendermint.TendermintBlockchainConfig;
 
 /**
- * Go inside the hotmoka project, run
- * 
- * . set_variables.sh
- * 
- * then move inside this project and run
+ * Move inside this project and run
  * 
  * mvn clean package
- * java --module-path $explicit:$automatic:target/publish-0.0.1-SNAPSHOT.jar -classpath $unnamed"/*" --module blockchain/io.takamaka.publish.Publisher
+ * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/publish-0.0.1-SNAPSHOT.jar -classpath ../../hotmoka/modules/unnamed"/*" --module publish/publish.Publisher
  */
 public class Publisher {
   public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(100_000_000);
