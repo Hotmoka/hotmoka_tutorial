@@ -44,9 +44,10 @@ public class Decorators {
     MemoryBlockchainConfig config = new MemoryBlockchainConfig.Builder().build();
     ConsensusParams consensus = new ConsensusParams.Builder().build();
 
-    // the path of the packaged runtime Takamaka classes
+    // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
-      ("../../hotmoka/modules/explicit/io-takamaka-code-1.0.0.jar");
+      (System.getProperty("user.home") +
+      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.0/io-takamaka-code-1.0.0.jar");
 
     // the path of the user jar to install
     Path familyPath = Paths.get("../family/target/family-0.0.1-SNAPSHOT.jar");

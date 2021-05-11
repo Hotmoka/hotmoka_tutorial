@@ -46,8 +46,10 @@ public class Publisher {
     TendermintBlockchainConfig config = new TendermintBlockchainConfig.Builder().build();
     ConsensusParams consensus = new ConsensusParams.Builder().build();
     NodeServiceConfig serviceConfig = new NodeServiceConfig.Builder().build();
+    // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
-      ("../../hotmoka/modules/explicit/io-takamaka-code-1.0.0.jar");
+      (System.getProperty("user.home") +
+      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.0/io-takamaka-code-1.0.0.jar");
 
     try (Node original = TendermintBlockchain.init(config, consensus);
          // remove the next two lines if you want to publish an uninitialized node
@@ -56,7 +58,7 @@ public class Publisher {
          NodeService service = NodeService.of(serviceConfig, original)) {
 
       System.out.println("\nPress ENTER to turn off the server and exit this program");
-      System.console().readLine();
+      System.in.read();
     }
   }
 }
