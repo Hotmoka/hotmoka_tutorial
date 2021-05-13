@@ -31,7 +31,7 @@ import io.hotmoka.views.NodeWithAccounts;
 import io.hotmoka.views.NodeWithJars;
 
 /**
- * Move inside this project and run
+ * Run in the IDE or go inside this project and run
  * 
  * mvn clean package
  * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Decorators

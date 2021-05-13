@@ -45,7 +45,7 @@ import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
 
 /**
- * Move inside this project and run
+ * Run in the IDE or go inside this project and run
  * 
  * mvn clean package
  * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Family
