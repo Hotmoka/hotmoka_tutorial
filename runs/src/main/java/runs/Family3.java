@@ -72,7 +72,7 @@ public class Family3 {
     Path familyPath = Paths.get("../family_exported/target/family_exported-0.0.1-SNAPSHOT.jar");
 
     RemoteNodeConfig config = new RemoteNodeConfig.Builder()
-    	.setURL("ec2-54-194-239-91.eu-west-1.compute.amazonaws.com:8080")
+    	.setURL("panarea.hotmoka.io")
     	.build();
 
     try (Node node = RemoteNode.of(config)) {

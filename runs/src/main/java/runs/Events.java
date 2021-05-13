@@ -125,7 +125,7 @@ public class Events {
 
 	public static void main(String[] args) throws Exception {
 		RemoteNodeConfig config = new RemoteNodeConfig.Builder()
-			.setURL("ec2-54-194-239-91.eu-west-1.compute.amazonaws.com:8080")
+			.setURL("panarea.hotmoka.io")
 			.build();
 
 		try (Node node = RemoteNode.of(config)) {
