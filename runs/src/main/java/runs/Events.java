@@ -26,8 +26,6 @@ import static io.hotmoka.beans.types.ClassType.BIG_INTEGER;
 import static io.hotmoka.beans.types.ClassType.BYTES32_SNAPSHOT;
 import static io.hotmoka.beans.types.ClassType.PAYABLE_CONTRACT;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,6 +64,7 @@ import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
 import io.hotmoka.views.GasHelper;
 import io.hotmoka.views.NonceHelper;
+import io.hotmoka.views.SignatureHelper;
 
 /**
  * Run in the IDE or go inside this project and run
@@ -183,7 +182,7 @@ public class Events {
 		accounts = Stream.of(ADDRESSES).map(StorageReference::new).toArray(StorageReference[]::new);
 		SignatureAlgorithm<SignedTransactionRequest> signature
 		  = SignatureAlgorithmForTransactionRequests.mk(node.getNameOfSignatureAlgorithmForRequests());
-		signers = Stream.of(ADDRESSES).map(this::loadKeys).map(keys -> Signer.with(signature, keys)).toArray(Signer[]::new);
+		signers = Stream.of(accounts).map(this::loadKeys).map(keys -> Signer.with(signature, keys)).toArray(Signer[]::new);
 		gasHelper = new GasHelper(node);
 		nonceHelper = new NonceHelper(node);
 		chainId = getChainId();
@@ -375,9 +374,9 @@ public class Events {
 			new ByteValue(hash[30]), new ByteValue(hash[31])));
 	}
 
-	private KeyPair loadKeys(String account) {
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("../" + account + ".keys"))) {
-			return (KeyPair) ois.readObject();
+	private KeyPair loadKeys(StorageReference account) {
+		try {
+			return new SignatureHelper(node).signatureAlgorithmFor(account).readKeys("../" + account.toString());
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

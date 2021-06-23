@@ -47,7 +47,7 @@ public class Decorators {
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.0/io-takamaka-code-1.0.0.jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.1/io-takamaka-code-1.0.1.jar");
 
     // the path of the user jar to install
     Path familyPath = Paths.get("../family/target/family-0.0.1-SNAPSHOT.jar");

@@ -20,8 +20,6 @@ package runs;
 
 import static java.math.BigInteger.ONE;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,10 +37,11 @@ import io.hotmoka.beans.values.BigIntegerValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StringValue;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
-import io.hotmoka.views.GasHelper;
 import io.hotmoka.nodes.Node;
 import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
+import io.hotmoka.views.GasHelper;
+import io.hotmoka.views.SignatureHelper;
 
 /**
  * Run in the IDE or go inside this project and run
@@ -66,7 +65,7 @@ public class Family {
     	.build();
 
     try (Node node = RemoteNode.of(config)) {
-    	// we get a reference to where io-takamaka-code-1.0.0.jar has been stored
+    	// we get a reference to where io-takamaka-code-1.0.1.jar has been stored
         TransactionReference takamakaCode = node.getTakamakaCode();
 
         // we get the signing algorithm to use for requests
@@ -74,7 +73,7 @@ public class Family {
           = SignatureAlgorithmForTransactionRequests.mk(node.getNameOfSignatureAlgorithmForRequests());
 
         StorageReference account = new StorageReference(ADDRESS);
-        KeyPair keys = loadKeys(ADDRESS);
+        KeyPair keys = loadKeys(node, account);
 
         // we create a signer that signs with the private key of our account
         Signer signer = Signer.with(signature, keys.getPrivate());
@@ -124,9 +123,7 @@ public class Family {
     }
   }
 
-  private static KeyPair loadKeys(String account) throws Exception {
-	  try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("../" + account + ".keys"))) {
-		  return (KeyPair) ois.readObject();
-	  }
+  private static KeyPair loadKeys(Node node, StorageReference account) throws Exception {
+	  return new SignatureHelper(node).signatureAlgorithmFor(account).readKeys("../" + account.toString());
   }
 }

@@ -49,7 +49,7 @@ public class Publisher {
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.0/io-takamaka-code-1.0.0.jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.1/io-takamaka-code-1.0.1.jar");
 
     try (Node original = TendermintBlockchain.init(config, consensus);
          // remove the next two lines if you want to publish an uninitialized node
