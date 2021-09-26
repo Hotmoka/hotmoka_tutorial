@@ -57,6 +57,7 @@ import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StorageValue;
 import io.hotmoka.beans.values.StringValue;
+import io.hotmoka.crypto.Account;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.nodes.Node;
 import io.hotmoka.remote.RemoteNode;
@@ -108,7 +109,7 @@ public class Auction {
 	//the hashing algorithm used to hide the bids
 	private final MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-	private final Path auctionPath = Paths.get("../auction_events/target/auction_events-0.0.1-SNAPSHOT.jar");
+	private final Path auctionPath = Paths.get("../auction_events/target/auction_events-0.0.1.jar");
 	private final TransactionReference takamakaCode;
 	private final StorageReference[] accounts;
 	private final Signer[] signers;
@@ -369,7 +370,7 @@ public class Auction {
 
 	private KeyPair loadKeys(StorageReference account) {
 		try {
-			return new SignatureHelper(node).signatureAlgorithmFor(account).readKeys("../" + account.toString());
+			return new Account(account).keys("chocolate", new SignatureHelper(node).signatureAlgorithmFor(account));
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

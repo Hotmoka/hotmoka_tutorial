@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
-import io.hotmoka.beans.SignatureAlgorithm;
 import io.hotmoka.beans.references.TransactionReference;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
@@ -36,6 +35,8 @@ import io.hotmoka.beans.signatures.CodeSignature;
 import io.hotmoka.beans.values.BigIntegerValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StringValue;
+import io.hotmoka.crypto.Account;
+import io.hotmoka.crypto.SignatureAlgorithm;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.nodes.Node;
 import io.hotmoka.remote.RemoteNode;
@@ -53,12 +54,12 @@ public class Family {
 
   // change this with your account's storage reference
   private final static String ADDRESS =
-    "08ba1159da663e9c76ad614a1e9235fcfa2c3558a3437b1146ef438948d17d2d#0";
+    "8a21b72f3f499a128acf99463d7b25450d34e8f9b4a81ee0af5c9ff2dd10a23f#0";
 
   public static void main(String[] args) throws Exception {
 
 	// the path of the user jar to install
-    Path familyPath = Paths.get("../family/target/family-0.0.1-SNAPSHOT.jar");
+    Path familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
     RemoteNodeConfig config = new RemoteNodeConfig.Builder()
     	.setURL("panarea.hotmoka.io")
@@ -119,11 +120,11 @@ public class Family {
         // transactions having the account as payer
         nonce = nonce.add(ONE);
 
-        System.out.println("family-0.0.1-SNAPSHOT.jar installed at: " + family);
+        System.out.println("family-0.0.1.jar installed at: " + family);
     }
   }
 
   private static KeyPair loadKeys(Node node, StorageReference account) throws Exception {
-	  return new SignatureHelper(node).signatureAlgorithmFor(account).readKeys("../" + account.toString());
+    return new Account(account, "..").keys("chocolate", new SignatureHelper(node).signatureAlgorithmFor(account));
   }
 }

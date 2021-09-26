@@ -44,6 +44,7 @@ import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StorageValue;
 import io.hotmoka.beans.values.StringValue;
+import io.hotmoka.crypto.Account;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.nodes.Node;
 import io.hotmoka.remote.RemoteNode;
@@ -68,7 +69,7 @@ public class Family3 {
   public static void main(String[] args) throws Exception {
 
 	// the path of the user jar to install
-    Path familyPath = Paths.get("../family_exported/target/family_exported-0.0.1-SNAPSHOT.jar");
+    Path familyPath = Paths.get("../family_exported/target/family_exported-0.0.1.jar");
 
     RemoteNodeConfig config = new RemoteNodeConfig.Builder()
     	.setURL("panarea.hotmoka.io")
@@ -179,6 +180,6 @@ public class Family3 {
   }
 
   private static KeyPair loadKeys(Node node, StorageReference account) throws Exception {
-	  return new SignatureHelper(node).signatureAlgorithmFor(account).readKeys("../" + account.toString());
+	  return new Account(account).keys("chocolate", new SignatureHelper(node).signatureAlgorithmFor(account));
   }
 }
