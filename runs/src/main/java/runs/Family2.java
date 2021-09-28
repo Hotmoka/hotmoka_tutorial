@@ -60,7 +60,7 @@ public class Family2 {
 
   // change this with your account's storage reference
   private final static String ADDRESS =
-    "08ba1159da663e9c76ad614a1e9235fcfa2c3558a3437b1146ef438948d17d2d#0";
+    "8a21b72f3f499a128acf99463d7b25450d34e8f9b4a81ee0af5c9ff2dd10a23f#0";
 
   private final static ClassType PERSON = new ClassType("io.takamaka.family.Person");
 
@@ -156,6 +156,6 @@ public class Family2 {
   }
 
   private static KeyPair loadKeys(Node node, StorageReference account) throws Exception {
-	  return new Account(account).keys("chocolate", new SignatureHelper(node).signatureAlgorithmFor(account));
+	  return new Account(account, "..").keys("chocolate", new SignatureHelper(node).signatureAlgorithmFor(account));
   }
 }

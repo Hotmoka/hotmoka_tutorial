@@ -76,9 +76,9 @@ import io.hotmoka.views.SignatureHelper;
 public class Events {
 	// change this with your accounts' storage references
 	private final static String[] ADDRESSES =
-		{ "907dc7c84e09935b20db5bff1f30ce9c8e4f12b91a5f4f8ea7b8c10d242c7c44#0",
-		  "51f4f4d00febda26ba0ab91e94ae50d0947eb6f11795041699a469922eb1fabf#0",
-		  "6244da1ab9ceb3744890b63c78cb085430471197ee166cd16daf7608c703876b#0" };
+		{ "8a21b72f3f499a128acf99463d7b25450d34e8f9b4a81ee0af5c9ff2dd10a23f#0",
+		  "6602aedcfbee393a2828c7cc06e7319cf92502ce1c026b9e5527c27d799eeff9#0",
+		  "84ebc6ccdb2f5e76bb8b7d93c9b60805f518a76ae59f78e1b26bfc3734e5475d#0" };
 
 	public final static int NUM_BIDS = 20; // number of bids placed
 	public final static int BIDDING_TIME = 50_000; // in milliseconds
@@ -377,7 +377,15 @@ public class Events {
 
 	private KeyPair loadKeys(StorageReference account) {
 		try {
-			return new Account(account).keys("chocolate", new SignatureHelper(node).signatureAlgorithmFor(account));
+			String password;
+			if (account.toString().equals(ADDRESSES[0]))
+				password = "chocolate";
+			else if (account.toString().equals(ADDRESSES[1]))
+				password = "orange";
+			else
+				password = "apple";
+
+			return new Account(account, "..").keys(password, new SignatureHelper(node).signatureAlgorithmFor(account));
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
