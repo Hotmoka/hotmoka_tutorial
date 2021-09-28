@@ -53,11 +53,11 @@ public class Decorators {
     Path familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
     try (Node node = MemoryBlockchain.init(config, consensus)) {
-      // first view: store io-takamaka-code-1.0.0.jar and create manifest and gamete
+      // first view: store the io-takamaka-code jar and create manifest and gamete
       InitializedNode initialized = InitializedNode.of
         (node, consensus, "password", takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
 
-      // second view: store family-0.0.1-SNAPSHOT.jar: the gamete will pay for that
+      // second view: store family-0.0.1.jar: the gamete will pay for that
       NodeWithJars nodeWithJars = NodeWithJars.of
         (node, initialized.gamete().reference, initialized.keysOfGamete().getPrivate(),
         familyPath);
@@ -69,7 +69,7 @@ public class Decorators {
         BigInteger.valueOf(10_000_000), BigInteger.valueOf(20_000_000));
 
       System.out.println("manifest: " + node.getManifest());
-      System.out.println("family-0.0.1-SNAPSHOT.jar: " + nodeWithJars.jar(0));
+      System.out.println("family-0.0.1.jar: " + nodeWithJars.jar(0));
       System.out.println("account #0: " + nodeWithAccounts.account(0) +
                          "\n  with private key " + nodeWithAccounts.privateKey(0));
       System.out.println("account #1: " + nodeWithAccounts.account(1) +

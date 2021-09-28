@@ -54,7 +54,7 @@ public class Publisher {
     try (Node original = TendermintBlockchain.init(config, consensus);
          // remove the next two lines if you want to publish an uninitialized node
          InitializedNode initialized = InitializedNode.of
-           (original, consensus, "password", takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
+           (original, consensus, "password-of-gamete", takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
          NodeService service = NodeService.of(serviceConfig, original)) {
 
       System.out.println("\nPress ENTER to turn off the server and exit this program");
