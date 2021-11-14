@@ -21,7 +21,11 @@ package runs;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPair;
 
+import io.hotmoka.crypto.Base58;
+import io.hotmoka.crypto.Entropy;
+import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.memory.MemoryBlockchain;
 import io.hotmoka.memory.MemoryBlockchainConfig;
 import io.hotmoka.nodes.ConsensusParams;
@@ -47,25 +51,30 @@ public class Decorators {
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.4/io-takamaka-code-1.0.4.jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.5/io-takamaka-code-1.0.5.jar");
 
     // the path of the user jar to install
     Path familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
-    try (Node node = MemoryBlockchain.init(config, consensus)) {
+    // create a key pair for the gamete and compute the Base58-encoding of its public key
+    var signature = SignatureAlgorithmForTransactionRequests.ed25519();
+	Entropy entropy = new Entropy();
+	KeyPair keys = entropy.keys("password", signature);
+	var publicKeyBase58 = Base58.encode(signature.encodingOf(keys.getPublic()));
+
+	try (Node node = MemoryBlockchain.init(config, consensus)) {
       // first view: store the io-takamaka-code jar and create manifest and gamete
       InitializedNode initialized = InitializedNode.of
-        (node, consensus, "password", takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
+        (node, consensus, publicKeyBase58, takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
 
       // second view: store family-0.0.1.jar: the gamete will pay for that
       NodeWithJars nodeWithJars = NodeWithJars.of
-        (node, initialized.gamete().reference, initialized.keysOfGamete().getPrivate(),
-        familyPath);
+        (node, initialized.gamete(), keys.getPrivate(), familyPath);
 
-      // third view: create two accounts, the first with 10,000,000 units of coin
+	  // third view: create two accounts, the first with 10,000,000 units of coin
       // and the second with 20,000,000 units of coin; the gamete will pay
       NodeWithAccounts nodeWithAccounts = NodeWithAccounts.of
-        (node, initialized.gamete().reference, initialized.keysOfGamete().getPrivate(),
+        (node, initialized.gamete(), keys.getPrivate(),
         BigInteger.valueOf(10_000_000), BigInteger.valueOf(20_000_000));
 
       System.out.println("manifest: " + node.getManifest());

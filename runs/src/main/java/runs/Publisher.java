@@ -23,7 +23,11 @@ import static java.math.BigInteger.ZERO;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPair;
 
+import io.hotmoka.crypto.Base58;
+import io.hotmoka.crypto.Entropy;
+import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.Node;
 import io.hotmoka.views.InitializedNode;
@@ -49,16 +53,22 @@ public class Publisher {
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.4/io-takamaka-code-1.0.4.jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.5/io-takamaka-code-1.0.5.jar");
 
-    try (Node original = TendermintBlockchain.init(config, consensus);
+    // create a key pair for the gamete and compute the Base58-encoding of its public key
+    var signature = SignatureAlgorithmForTransactionRequests.ed25519();
+	Entropy entropy = new Entropy();
+	KeyPair keys = entropy.keys("password", signature);
+	var publicKeyBase58 = Base58.encode(signature.encodingOf(keys.getPublic()));
+
+	try (Node original = TendermintBlockchain.init(config, consensus);
          // remove the next two lines if you want to publish an uninitialized node
-         InitializedNode initialized = InitializedNode.of
-           (original, consensus, "password-of-gamete", takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
+         //InitializedNode initialized = InitializedNode.of
+         //  (original, consensus, publicKeyBase58, takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
          NodeService service = NodeService.of(serviceConfig, original)) {
 
-      System.out.println("\nPress ENTER to turn off the server and exit this program");
-      System.in.read();
+        System.out.println("\nPress ENTER to turn off the server and exit this program");
+        System.in.read();
     }
   }
 }
