@@ -26,13 +26,13 @@ import java.security.KeyPair;
 import io.hotmoka.crypto.Base58;
 import io.hotmoka.crypto.Entropy;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.helpers.InitializedNode;
+import io.hotmoka.helpers.NodeWithAccounts;
+import io.hotmoka.helpers.NodeWithJars;
 import io.hotmoka.memory.MemoryBlockchain;
 import io.hotmoka.memory.MemoryBlockchainConfig;
 import io.hotmoka.nodes.ConsensusParams;
 import io.hotmoka.nodes.Node;
-import io.hotmoka.views.InitializedNode;
-import io.hotmoka.views.NodeWithAccounts;
-import io.hotmoka.views.NodeWithJars;
 
 /**
  * Run in the IDE or go inside this project and run

@@ -46,11 +46,11 @@ import io.hotmoka.beans.values.StorageValue;
 import io.hotmoka.beans.values.StringValue;
 import io.hotmoka.crypto.Account;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.helpers.GasHelper;
+import io.hotmoka.helpers.SignatureHelper;
 import io.hotmoka.nodes.Node;
 import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
-import io.hotmoka.views.GasHelper;
-import io.hotmoka.views.SignatureHelper;
 
 /**
  * Run in the IDE or go inside this project and run
