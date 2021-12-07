@@ -75,9 +75,9 @@ import io.hotmoka.remote.RemoteNodeConfig;
 public class Auction {
 	// change this with your accounts' storage references
 	private final static String[] ADDRESSES =
-		{ "8a21b72f3f499a128acf99463d7b25450d34e8f9b4a81ee0af5c9ff2dd10a23f#0",
-		  "6602aedcfbee393a2828c7cc06e7319cf92502ce1c026b9e5527c27d799eeff9#0",
-		  "84ebc6ccdb2f5e76bb8b7d93c9b60805f518a76ae59f78e1b26bfc3734e5475d#0" };
+		{ "551f32570409cd856f96537d546a65a9f7ffed0ec62ed1a90db346c0adf03cbe#0",
+		  "61b5e1867abfc978bbc1859ad611001784fc027718fa0538d127f34380ca1058#0",
+		  "caaa415201af5f9bb1e45ed2b469b1982ef4cd7c73520cd7c863d9f07766c9c6#0" };
 
 	public final static int NUM_BIDS = 20; // number of bids placed
 	public final static int BIDDING_TIME = 50_000; // in milliseconds

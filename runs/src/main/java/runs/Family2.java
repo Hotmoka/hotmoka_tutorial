@@ -60,7 +60,7 @@ public class Family2 {
 
   // change this with your account's storage reference
   private final static String ADDRESS =
-    "8a21b72f3f499a128acf99463d7b25450d34e8f9b4a81ee0af5c9ff2dd10a23f#0";
+    "551f32570409cd856f96537d546a65a9f7ffed0ec62ed1a90db346c0adf03cbe#0";
 
   private final static ClassType PERSON = new ClassType("io.takamaka.family.Person");
 

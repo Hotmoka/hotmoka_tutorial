@@ -53,7 +53,7 @@ public class Publisher {
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.5/io-takamaka-code-1.0.5.jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.6/io-takamaka-code-1.0.6.jar");
 
     // create a key pair for the gamete and compute the Base58-encoding of its public key
     var signature = SignatureAlgorithmForTransactionRequests.ed25519();
