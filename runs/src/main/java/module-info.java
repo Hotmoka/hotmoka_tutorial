@@ -7,4 +7,5 @@ module runs {
   requires io.hotmoka.memory;
   requires io.hotmoka.tendermint;
   requires io.hotmoka.service;
+  requires io.hotmoka.constants;
 }

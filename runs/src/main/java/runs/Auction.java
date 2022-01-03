@@ -74,14 +74,17 @@ import io.hotmoka.remote.RemoteNodeConfig;
  */
 public class Auction {
 	// change this with your accounts' storage references
-	private final static String[] ADDRESSES =
-		{ "551f32570409cd856f96537d546a65a9f7ffed0ec62ed1a90db346c0adf03cbe#0",
-		  "61b5e1867abfc978bbc1859ad611001784fc027718fa0538d127f34380ca1058#0",
-		  "caaa415201af5f9bb1e45ed2b469b1982ef4cd7c73520cd7c863d9f07766c9c6#0" };
+	private final static String[] ADDRESSES = new String[3];
+	
+	static {
+		ADDRESSES[0] = "f698bae6f5a6d21a20309d2581d46a3a7e8d3f43802bc676cc52651ff6f36411#0";
+		ADDRESSES[1] = "26b240580489d5a00e241db547fe2ae756a0209ae87fc6a17e4a06f36f1e7ff0#0";
+		ADDRESSES[2] = "48ef7306af5e86adbe01dd7807e1c7bf30fbd3781a63e770245ac72743c5fd1a#0";
+	}
 
-	public final static int NUM_BIDS = 20; // number of bids placed
-	public final static int BIDDING_TIME = 50_000; // in milliseconds
-	public final static int REVEAL_TIME = 70_000; // in milliseconds
+	public final static int NUM_BIDS = 10; // number of bids placed
+	public final static int BIDDING_TIME = 130_000; // in milliseconds
+	public final static int REVEAL_TIME = 170_000; // in milliseconds
 
 	private final static BigInteger _500_000 = BigInteger.valueOf(500_000);
 
@@ -102,14 +105,15 @@ public class Auction {
 	private final static MethodSignature BID = new VoidMethodSignature
 			(BLIND_AUCTION, "bid", BIG_INTEGER, BYTES32_SNAPSHOT);
 	private final static MethodSignature REVEAL = new VoidMethodSignature
-			(BLIND_AUCTION, "reveal", new ClassType("io.takamaka.auction.BlindAuction$RevealedBid"));
+			(BLIND_AUCTION, "reveal",
+			new ClassType("io.takamaka.auction.BlindAuction$RevealedBid"));
 	private final static MethodSignature AUCTION_END = new NonVoidMethodSignature
 			(BLIND_AUCTION, "auctionEnd", PAYABLE_CONTRACT);
 
 	//the hashing algorithm used to hide the bids
 	private final MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-	private final Path auctionPath = Paths.get("../auction_events/target/auction_events-0.0.1.jar");
+	private final Path auctionPath = Paths.get("../auction/target/auction-0.0.1.jar");
 	private final TransactionReference takamakaCode;
 	private final StorageReference[] accounts;
 	private final Signer[] signers;
@@ -124,7 +128,7 @@ public class Auction {
 
 	public static void main(String[] args) throws Exception {
 		RemoteNodeConfig config = new RemoteNodeConfig.Builder()
-			.setURL("panarea.hotmoka.io")
+			.setURL("panarea.hotmoka.io:8080")
 			.build();
 
 		try (Node node = RemoteNode.of(config)) {

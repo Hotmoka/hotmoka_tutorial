@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
+import io.hotmoka.constants.Constants;
 import io.hotmoka.crypto.Base58;
 import io.hotmoka.crypto.Entropy;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
@@ -51,7 +52,7 @@ public class Decorators {
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.6/io-takamaka-code-1.0.6.jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/" + Constants.VERSION + "/io-takamaka-code-" + Constants.VERSION + ".jar");
 
     // the path of the user jar to install
     Path familyPath = Paths.get("../family/target/family-0.0.1.jar");

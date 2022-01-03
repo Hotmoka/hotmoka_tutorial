@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
+import io.hotmoka.constants.Constants;
 import io.hotmoka.crypto.Base58;
 import io.hotmoka.crypto.Entropy;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
@@ -53,7 +54,7 @@ public class Publisher {
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/1.0.6/io-takamaka-code-1.0.6.jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/" + Constants.VERSION + "/io-takamaka-code-" + Constants.VERSION + ".jar");
 
     // create a key pair for the gamete and compute the Base58-encoding of its public key
     var signature = SignatureAlgorithmForTransactionRequests.ed25519();
