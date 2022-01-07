@@ -62,7 +62,7 @@ public class Family3 {
 
   // change this with your account's storage reference
   private final static String
-    ADDRESS = "f698bae6f5a6d21a20309d2581d46a3a7e8d3f43802bc676cc52651ff6f36411#0";
+    ADDRESS = "0ad8f34419eafa6d095c0a20f95cfc42b6d08cbc69cff0789ade38c5772e2a4b#0";
 
   private final static ClassType PERSON = new ClassType("io.takamaka.family.Person");
 
@@ -72,7 +72,7 @@ public class Family3 {
     Path familyPath = Paths.get("../family_exported/target/family_exported-0.0.1.jar");
 
     RemoteNodeConfig config = new RemoteNodeConfig.Builder()
-    	.setURL("panarea.hotmoka.io:8080")
+    	.setURL("panarea.hotmoka.io")
     	.build();
 
     try (Node node = RemoteNode.of(config)) {

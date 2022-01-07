@@ -79,9 +79,9 @@ public class Events {
 	private final static String[] ADDRESSES = new String[3];
 	
 	static {
-		ADDRESSES[0] = "f698bae6f5a6d21a20309d2581d46a3a7e8d3f43802bc676cc52651ff6f36411#0";
-		ADDRESSES[1] = "26b240580489d5a00e241db547fe2ae756a0209ae87fc6a17e4a06f36f1e7ff0#0";
-		ADDRESSES[2] = "48ef7306af5e86adbe01dd7807e1c7bf30fbd3781a63e770245ac72743c5fd1a#0";
+		ADDRESSES[0] = "0ad8f34419eafa6d095c0a20f95cfc42b6d08cbc69cff0789ade38c5772e2a4b#0";
+		ADDRESSES[1] = "cb1368fcb822b1720a997c9c24aac2f901e455fa38438ce41879de9164237cd5#0";
+		ADDRESSES[2] = "27249ea17c724f2c4703f954feaf5ebb018fbe06b355a7022bb794c754f29a8e#0";
 	}
 
 	public final static int NUM_BIDS = 10; // number of bids placed
@@ -129,7 +129,7 @@ public class Events {
 
 	public static void main(String[] args) throws Exception {
 		RemoteNodeConfig config = new RemoteNodeConfig.Builder()
-			.setURL("panarea.hotmoka.io:8080")
+			.setURL("panarea.hotmoka.io")
 			.build();
 
 		try (Node node = RemoteNode.of(config)) {
