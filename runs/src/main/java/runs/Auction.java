@@ -77,9 +77,9 @@ public class Auction {
 	private final static String[] ADDRESSES = new String[3];
 	
 	static {
-		ADDRESSES[0] = "0ad8f34419eafa6d095c0a20f95cfc42b6d08cbc69cff0789ade38c5772e2a4b#0";
-		ADDRESSES[1] = "cb1368fcb822b1720a997c9c24aac2f901e455fa38438ce41879de9164237cd5#0";
-		ADDRESSES[2] = "27249ea17c724f2c4703f954feaf5ebb018fbe06b355a7022bb794c754f29a8e#0";
+		ADDRESSES[0] = "660d7339698a87a98820e9afb58a194ed1000d76b1263fd5182e0c387494861a#0";
+		ADDRESSES[1] = "d644a9434807101b819ff2d1742728cce932cf1fa1bce08e7690e39bec850525#0";
+		ADDRESSES[2] = "3eb9267ff6f32a7f3e23298dddf2e2d5f7cdb9b3f1293b2f467fc15eaec78761#0";
 	}
 
 	public final static int NUM_BIDS = 10; // number of bids placed

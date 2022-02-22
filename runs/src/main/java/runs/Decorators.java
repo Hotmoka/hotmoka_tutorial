@@ -22,9 +22,9 @@ import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
+import java.util.Base64;
 
 import io.hotmoka.constants.Constants;
-import io.hotmoka.crypto.Base58;
 import io.hotmoka.crypto.Entropy;
 import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.helpers.InitializedNode;
@@ -42,12 +42,10 @@ import io.hotmoka.nodes.Node;
  * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Decorators
  */
 public class Decorators {
-  public final static BigInteger GREEN_AMOUNT = BigInteger.valueOf(1_000_000_000);
-  public final static BigInteger RED_AMOUNT = BigInteger.ZERO;
+  public final static BigInteger SUPPLY = BigInteger.valueOf(1_000_000_000);
 
   public static void main(String[] args) throws Exception {
     MemoryBlockchainConfig config = new MemoryBlockchainConfig.Builder().build();
-    ConsensusParams consensus = new ConsensusParams.Builder().build();
 
     // the path of the runtime Takamaka jar, inside Maven's cache
     Path takamakaCodePath = Paths.get
@@ -57,16 +55,18 @@ public class Decorators {
     // the path of the user jar to install
     Path familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
-    // create a key pair for the gamete and compute the Base58-encoding of its public key
+    // create a key pair for the gamete and compute the Base64-encoding of its public key
     var signature = SignatureAlgorithmForTransactionRequests.ed25519();
 	Entropy entropy = new Entropy();
 	KeyPair keys = entropy.keys("password", signature);
-	var publicKeyBase58 = Base58.encode(signature.encodingOf(keys.getPublic()));
+	var publicKeyBase64 = Base64.getEncoder().encodeToString(signature.encodingOf(keys.getPublic()));
+	ConsensusParams consensus = new ConsensusParams.Builder()
+   		.setInitialSupply(SUPPLY)
+   		.setPublicKeyOfGamete(publicKeyBase64).build();
 
 	try (Node node = MemoryBlockchain.init(config, consensus)) {
       // first view: store the io-takamaka-code jar and create manifest and gamete
-      InitializedNode initialized = InitializedNode.of
-        (node, consensus, publicKeyBase58, takamakaCodePath, GREEN_AMOUNT, RED_AMOUNT);
+      InitializedNode initialized = InitializedNode.of(node, consensus, takamakaCodePath);
 
       // second view: store family-0.0.1.jar: the gamete will pay for that
       NodeWithJars nodeWithJars = NodeWithJars.of
