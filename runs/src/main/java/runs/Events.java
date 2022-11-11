@@ -79,9 +79,9 @@ public class Events {
 	private final static String[] ADDRESSES = new String[3];
 	
 	static {
-		ADDRESSES[0] = "660d7339698a87a98820e9afb58a194ed1000d76b1263fd5182e0c387494861a#0";
-		ADDRESSES[1] = "d644a9434807101b819ff2d1742728cce932cf1fa1bce08e7690e39bec850525#0";
-		ADDRESSES[2] = "3eb9267ff6f32a7f3e23298dddf2e2d5f7cdb9b3f1293b2f467fc15eaec78761#0";
+		ADDRESSES[0] = "b554954fe64c3c9b302664ff631f27ef64578692d14c99330b93c3844bb07470#0";
+		ADDRESSES[1] = "d8ee1b7e0f7f30accc67c7faa123d9ad81fdc26de9c4ddc19419ac57ea5830e4#0";
+		ADDRESSES[2] = "0e27d8cd23b0c7c0c0601a197947a6370fdfb192c97cf3108a0c309b12bcda87#0";
 	}
 
 	public final static int NUM_BIDS = 10; // number of bids placed
