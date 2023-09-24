@@ -19,7 +19,7 @@
     <dependency>
       <groupId>io.hotmoka</groupId>
       <artifactId>io-takamaka-code</artifactId>
-      <version>1.0.11</version>
+      <version>1.0.13</version>
     </dependency>
   </dependencies>
 

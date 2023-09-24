@@ -74,7 +74,7 @@ public class TicTacToe extends Contract {
       "coordinates must be between 1 and 3");
     require(at(x, y) == Tile.EMPTY, "the selected tile is not empty");
 
-    PayableContract player = (PayableContract) caller();
+    var player = (PayableContract) caller();
 
     if (turn == Tile.CROSS)
       if (crossPlayer == null)

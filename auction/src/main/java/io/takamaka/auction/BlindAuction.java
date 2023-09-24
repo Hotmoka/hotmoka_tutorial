@@ -186,14 +186,14 @@ public class BlindAuction extends Contract {
 
     onlyAfter(biddingEnd);
     onlyBefore(revealEnd);
-    PayableContract bidder = (PayableContract) caller();
+    var bidder = (PayableContract) caller();
     StorageList<Bid> bids = this.bids.get(bidder);
     require(bids != null && bids.size() > 0, "No bids to reveal");
     require(revealed != null, () -> "The revealed bid cannot be null");
 
     // any other hashing algorithm will do, as long as
     // both bidder and auction contract use the same
-    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    var digest = MessageDigest.getInstance("SHA-256");
     // by removing the head of the list, it makes it impossible
     // for the caller to re-claim the same deposits
     bidder.receive(refundFor(bidder, bids.removeFirst(), revealed, digest));

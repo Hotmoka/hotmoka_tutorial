@@ -19,21 +19,19 @@
 package runs;
 
 import java.math.BigInteger;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.util.Base64;
 
 import io.hotmoka.constants.Constants;
-import io.hotmoka.crypto.Entropy;
-import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
-import io.hotmoka.helpers.InitializedNode;
-import io.hotmoka.helpers.NodeWithAccounts;
-import io.hotmoka.helpers.NodeWithJars;
-import io.hotmoka.memory.MemoryBlockchain;
-import io.hotmoka.memory.MemoryBlockchainConfig;
-import io.hotmoka.nodes.ConsensusParams;
-import io.hotmoka.nodes.Node;
+import io.hotmoka.crypto.Entropies;
+import io.hotmoka.helpers.AccountsNodes;
+import io.hotmoka.helpers.InitializedNodes;
+import io.hotmoka.helpers.JarsNodes;
+import io.hotmoka.node.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.node.SimpleConsensusConfigBuilders;
+import io.hotmoka.node.disk.DiskNodeConfigBuilders;
+import io.hotmoka.node.disk.DiskNodes;
 
 /**
  * Run in the IDE or go inside this project and run
@@ -45,36 +43,35 @@ public class Decorators {
   public final static BigInteger SUPPLY = BigInteger.valueOf(1_000_000_000);
 
   public static void main(String[] args) throws Exception {
-    MemoryBlockchainConfig config = new MemoryBlockchainConfig.Builder().build();
+    var config = DiskNodeConfigBuilders.defaults().build();
 
     // the path of the runtime Takamaka jar, inside Maven's cache
-    Path takamakaCodePath = Paths.get
+    var takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
-      "/.m2/repository/io/hotmoka/io-takamaka-code/" + Constants.VERSION + "/io-takamaka-code-" + Constants.VERSION + ".jar");
+      "/.m2/repository/io/hotmoka/io-takamaka-code/" + Constants.TAKAMAKA_VERSION + "/io-takamaka-code-" + Constants.TAKAMAKA_VERSION + ".jar");
 
     // the path of the user jar to install
-    Path familyPath = Paths.get("../family/target/family-0.0.1.jar");
+    var familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
     // create a key pair for the gamete and compute the Base64-encoding of its public key
     var signature = SignatureAlgorithmForTransactionRequests.ed25519();
-	Entropy entropy = new Entropy();
+	var entropy = Entropies.random();
 	KeyPair keys = entropy.keys("password", signature);
 	var publicKeyBase64 = Base64.getEncoder().encodeToString(signature.encodingOf(keys.getPublic()));
-	ConsensusParams consensus = new ConsensusParams.Builder()
+	var consensus = SimpleConsensusConfigBuilders.defaults()
    		.setInitialSupply(SUPPLY)
    		.setPublicKeyOfGamete(publicKeyBase64).build();
 
-	try (Node node = MemoryBlockchain.init(config, consensus)) {
+	try (var node = DiskNodes.init(config, consensus)) {
       // first view: store the io-takamaka-code jar and create manifest and gamete
-      InitializedNode initialized = InitializedNode.of(node, consensus, takamakaCodePath);
+	  var initialized = InitializedNodes.of(node, consensus, takamakaCodePath);
 
       // second view: store family-0.0.1.jar: the gamete will pay for that
-      NodeWithJars nodeWithJars = NodeWithJars.of
-        (node, initialized.gamete(), keys.getPrivate(), familyPath);
+      var nodeWithJars = JarsNodes.of(node, initialized.gamete(), keys.getPrivate(), familyPath);
 
 	  // third view: create two accounts, the first with 10,000,000 units of coin
       // and the second with 20,000,000 units of coin; the gamete will pay
-      NodeWithAccounts nodeWithAccounts = NodeWithAccounts.of
+      var nodeWithAccounts = AccountsNodes.of
         (node, initialized.gamete(), keys.getPrivate(),
         BigInteger.valueOf(10_000_000), BigInteger.valueOf(20_000_000));
 

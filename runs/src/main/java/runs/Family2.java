@@ -24,17 +24,13 @@ import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
-import io.hotmoka.beans.SignatureAlgorithm;
 import io.hotmoka.beans.references.TransactionReference;
 import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
-import io.hotmoka.beans.requests.SignedTransactionRequest;
-import io.hotmoka.beans.requests.SignedTransactionRequest.Signer;
 import io.hotmoka.beans.signatures.CodeSignature;
 import io.hotmoka.beans.signatures.ConstructorSignature;
 import io.hotmoka.beans.types.ClassType;
@@ -42,11 +38,12 @@ import io.hotmoka.beans.values.BigIntegerValue;
 import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StringValue;
-import io.hotmoka.crypto.Account;
-import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
-import io.hotmoka.helpers.GasHelper;
-import io.hotmoka.helpers.SignatureHelper;
-import io.hotmoka.nodes.Node;
+import io.hotmoka.crypto.Signers;
+import io.hotmoka.helpers.GasHelpers;
+import io.hotmoka.helpers.SignatureHelpers;
+import io.hotmoka.node.Accounts;
+import io.hotmoka.node.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.node.api.Node;
 import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
 
@@ -67,25 +64,24 @@ public class Family2 {
   public static void main(String[] args) throws Exception {
 
 	// the path of the user jar to install
-    Path familyPath = Paths.get("../family_storage/target/family_storage-0.0.1.jar");
+    var familyPath = Paths.get("../family_storage/target/family_storage-0.0.1.jar");
 
-    RemoteNodeConfig config = new RemoteNodeConfig.Builder()
+    var config = new RemoteNodeConfig.Builder()
     	.setURL("panarea.hotmoka.io")
     	.build();
 
-    try (Node node = RemoteNode.of(config)) {
+    try (var node = RemoteNode.of(config)) {
     	// we get a reference to where io-takamaka-code-1.0.1.jar has been stored
         TransactionReference takamakaCode = node.getTakamakaCode();
 
         // we get the signing algorithm to use for requests
-        SignatureAlgorithm<SignedTransactionRequest> signature
-          = SignatureAlgorithmForTransactionRequests.mk(node.getNameOfSignatureAlgorithmForRequests());
+        var signature = SignatureAlgorithmForTransactionRequests.of(node.getNameOfSignatureAlgorithmForRequests());
 
-        StorageReference account = new StorageReference(ADDRESS);
+        var account = new StorageReference(ADDRESS);
         KeyPair keys = loadKeys(node, account);
 
         // we create a signer that signs with the private key of our account
-        Signer signer = Signer.with(signature, keys.getPrivate());
+        var signer = Signers.with(signature, keys.getPrivate());
 
         // we get the nonce of our account: we use the account itself as caller and
         // an arbitrary nonce (ZERO in the code) since we are running
@@ -109,7 +105,7 @@ public class Family2 {
             node.getManifest()))) // receiver of the method call
           .value;
 
-        GasHelper gasHelper = new GasHelper(node);
+        var gasHelper = GasHelpers.of(node);
 
         // we install family-0.0.1-SNAPSHOT.jar in the node: our account will pay
         TransactionReference family = node
@@ -156,6 +152,6 @@ public class Family2 {
   }
 
   private static KeyPair loadKeys(Node node, StorageReference account) throws Exception {
-	  return new Account(account, "..").keys("chocolate", new SignatureHelper(node).signatureAlgorithmFor(account));
+	  return Accounts.of(account, "..").keys("chocolate", SignatureHelpers.of(node).signatureAlgorithmFor(account));
   }
 }

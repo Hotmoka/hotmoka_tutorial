@@ -34,8 +34,8 @@ public class CryptoBuddy extends ERC20 {
   public @FromContract CryptoBuddy() {
     super("CryptoBuddy", "CB");
     owner = caller();
-    UnsignedBigInteger initialSupply = new UnsignedBigInteger("200000");
-    UnsignedBigInteger multiplier = new UnsignedBigInteger("10").pow(18);
+    var initialSupply = new UnsignedBigInteger("200000");
+    var multiplier = new UnsignedBigInteger("10").pow(18);
     _mint(caller(), initialSupply.multiply(multiplier)); // 200'000 * 10 ^ 18
   }
 

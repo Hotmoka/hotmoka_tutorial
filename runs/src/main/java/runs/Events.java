@@ -35,15 +35,14 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.hotmoka.beans.SignatureAlgorithm;
 import io.hotmoka.beans.references.TransactionReference;
 import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
-import io.hotmoka.beans.requests.SignedTransactionRequest.Signer;
 import io.hotmoka.beans.signatures.CodeSignature;
 import io.hotmoka.beans.signatures.ConstructorSignature;
 import io.hotmoka.beans.signatures.MethodSignature;
@@ -57,13 +56,16 @@ import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StorageValue;
 import io.hotmoka.beans.values.StringValue;
-import io.hotmoka.crypto.Account;
-import io.hotmoka.crypto.SignatureAlgorithmForTransactionRequests;
-import io.hotmoka.helpers.GasHelper;
-import io.hotmoka.helpers.NonceHelper;
-import io.hotmoka.helpers.SignatureHelper;
-import io.hotmoka.nodes.Node;
-import io.hotmoka.nodes.Node.Subscription;
+import io.hotmoka.crypto.Signers;
+import io.hotmoka.crypto.api.Signer;
+import io.hotmoka.helpers.GasHelpers;
+import io.hotmoka.helpers.NonceHelpers;
+import io.hotmoka.helpers.SignatureHelpers;
+import io.hotmoka.helpers.api.GasHelper;
+import io.hotmoka.helpers.api.NonceHelper;
+import io.hotmoka.node.Accounts;
+import io.hotmoka.node.SignatureAlgorithmForTransactionRequests;
+import io.hotmoka.node.api.Node;
 import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
 
@@ -117,7 +119,7 @@ public class Events {
 	private final Path auctionPath = Paths.get("../auction_events/target/auction_events-0.0.1.jar");
 	private final TransactionReference takamakaCode;
 	private final StorageReference[] accounts;
-	private final Signer[] signers;
+	private final List<Signer<SignedTransactionRequest>> signers;
 	private final String chainId;
 	private final long start;  // the time when bids started being placed
 	private final Node node;
@@ -128,11 +130,11 @@ public class Events {
 	private final NonceHelper nonceHelper;
 
 	public static void main(String[] args) throws Exception {
-		RemoteNodeConfig config = new RemoteNodeConfig.Builder()
+		var config = new RemoteNodeConfig.Builder()
 			.setURL("panarea.hotmoka.io")
 			.build();
 
-		try (Node node = RemoteNode.of(config)) {
+		try (var node = RemoteNode.of(config)) {
 			new Events(node);
 		}
 	}
@@ -161,7 +163,7 @@ public class Events {
 		 */
 		private StorageReference intoBlockchain() throws Exception {
 			StorageReference bytes32 = node.addConstructorCallTransaction(new ConstructorCallTransactionRequest
-				(signers[player], accounts[player],
+				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
 				panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
 				new ByteValue(salt[0]), new ByteValue(salt[1]), new ByteValue(salt[2]), new ByteValue(salt[3]),
@@ -174,7 +176,7 @@ public class Events {
 				new ByteValue(salt[28]), new ByteValue(salt[29]), new ByteValue(salt[30]), new ByteValue(salt[31])));
 
 			return node.addConstructorCallTransaction(new ConstructorCallTransactionRequest
-				(signers[player], accounts[player],
+				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId,
 				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_REVEALED_BID,
 				new BigIntegerValue(value), new BooleanValue(fake), bytes32));
@@ -185,17 +187,17 @@ public class Events {
 		this.node = node;
 		takamakaCode = node.getTakamakaCode();
 		accounts = Stream.of(ADDRESSES).map(StorageReference::new).toArray(StorageReference[]::new);
-		SignatureAlgorithm<SignedTransactionRequest> signature
-		  = SignatureAlgorithmForTransactionRequests.mk(node.getNameOfSignatureAlgorithmForRequests());
-		signers = Stream.of(accounts).map(this::loadKeys).map(keys -> Signer.with(signature, keys)).toArray(Signer[]::new);
-		gasHelper = new GasHelper(node);
-		nonceHelper = new NonceHelper(node);
+		var signature = SignatureAlgorithmForTransactionRequests.of(node.getNameOfSignatureAlgorithmForRequests());
+		signers = Stream.of(accounts).map(this::loadKeys).map(keys -> Signers.with(signature, keys))
+			.collect(Collectors.toCollection(ArrayList::new));
+		gasHelper = GasHelpers.of(node);
+		nonceHelper = NonceHelpers.of(node);
 		chainId = getChainId();
 		classpath = installJar();
 		auction = createContract();
 		start = System.currentTimeMillis();
 
-		try (Subscription subscription = node.subscribeToEvents(auction,
+		try (var subscription = node.subscribeToEvents(auction,
 				(creator, event) -> System.out.println
 				("Seen event of class " + node.getClassTag(event).clazz.name
 						+ " created by contract " + creator))) {
@@ -216,7 +218,7 @@ public class Events {
 		System.out.println("Creating contract");
 
 		return node.addConstructorCallTransaction
-			(new ConstructorCallTransactionRequest(signers[0], accounts[0],
+			(new ConstructorCallTransactionRequest(signers.get(0), accounts[0],
 			nonceHelper.getNonceOf(accounts[0]), chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
 			classpath, CONSTRUCTOR_BLIND_AUCTION,
 			new IntValue(BIDDING_TIME), new IntValue(REVEAL_TIME)));
@@ -236,7 +238,7 @@ public class Events {
 		System.out.println("Installing jar");
 
 		return node.addJarStoreTransaction(new JarStoreTransactionRequest
-			(signers[0], // an object that signs with the payer's private key
+			(signers.get(0), // an object that signs with the payer's private key
 			accounts[0], // payer
 			nonceHelper.getNonceOf(accounts[0]), // payer's nonce
 			chainId, // chain identifier
@@ -248,18 +250,18 @@ public class Events {
 	}
 
 	private StorageReference placeBids() throws Exception {
-		BigInteger maxBid = BigInteger.ZERO;
+		var maxBid = BigInteger.ZERO;
 		StorageReference expectedWinner = null;
-		Random random = new Random();
+		var random = new Random();
 
 		int i = 1;
 		while (i <= NUM_BIDS) { // generate NUM_BIDS random bids
 			System.out.println("Placing bid " + i);
 			int player = 1 + random.nextInt(accounts.length - 1);
-			BigInteger deposit = BigInteger.valueOf(random.nextInt(1000));
-			BigInteger value = BigInteger.valueOf(random.nextInt(1000));
-			boolean fake = random.nextBoolean();
-			byte[] salt = new byte[32];
+			var deposit = BigInteger.valueOf(random.nextInt(1000));
+			var value = BigInteger.valueOf(random.nextInt(1000));
+			var fake = random.nextBoolean();
+			var salt = new byte[32];
 			random.nextBytes(salt); // random 32 bytes of salt for each bid
 
 			// create a Bytes32 hash of the bid in the store of the node
@@ -282,7 +284,7 @@ public class Events {
 
 			// place a hashed bid in the node
 			node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
-				(signers[player], accounts[player],
+				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId,
 				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, BID,
 				auction, new BigIntegerValue(deposit), bytes32));
@@ -301,7 +303,7 @@ public class Events {
 			int player = bid.player;
 			StorageReference bidInBlockchain = bid.intoBlockchain();
 			node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
-				(signers[player], accounts[player],
+				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
 				panarea(gasHelper.getSafeGasPrice()),
 				classpath, REVEAL, auction, bidInBlockchain));
@@ -311,7 +313,7 @@ public class Events {
 	private StorageReference askForWinner() throws Exception {
 		StorageValue winner = node.addInstanceMethodCallTransaction
 			(new InstanceMethodCallTransactionRequest
-			(signers[0], accounts[0], nonceHelper.getNonceOf(accounts[0]),
+			(signers.get(0), accounts[0], nonceHelper.getNonceOf(accounts[0]),
 			chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
 			classpath, AUCTION_END, auction));
 
@@ -356,7 +358,7 @@ public class Events {
 	private StorageReference createBytes32(int player, byte[] hash) throws Exception {
 		return node.addConstructorCallTransaction
 			(new ConstructorCallTransactionRequest(
-			signers[player],
+			signers.get(player),
 			accounts[player],
 			nonceHelper.getNonceOf(accounts[player]), chainId,
 			_500_000, panarea(gasHelper.getSafeGasPrice()),
@@ -389,7 +391,7 @@ public class Events {
 			else
 				password = "apple";
 
-			return new Account(account, "..").keys(password, new SignatureHelper(node).signatureAlgorithmFor(account));
+			return Accounts.of(account, "..").keys(password, SignatureHelpers.of(node).signatureAlgorithmFor(account));
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
