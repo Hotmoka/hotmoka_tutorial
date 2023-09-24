@@ -1,6 +1,5 @@
 module runs {
   requires io.hotmoka.beans;
-  requires io.hotmoka.node;
   requires io.hotmoka.helpers;
   requires io.hotmoka.remote;
   requires io.hotmoka.crypto;

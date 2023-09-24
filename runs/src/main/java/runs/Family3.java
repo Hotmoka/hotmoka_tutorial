@@ -59,7 +59,7 @@ public class Family3 {
 
   // change this with your account's storage reference
   private final static String
-    ADDRESS = "b554954fe64c3c9b302664ff631f27ef64578692d14c99330b93c3844bb07470#0";
+    ADDRESS = "ea3966e3e055e02695ccca9d6bd9d2eadc440182672f2c9ae2d93f8d5f13725c#0";
 
   private final static ClassType PERSON = new ClassType("io.takamaka.family.Person");
 
@@ -79,7 +79,7 @@ public class Family3 {
         // we get the signing algorithm to use for requests
         var signature = SignatureAlgorithmForTransactionRequests.of(node.getNameOfSignatureAlgorithmForRequests());
 
-        StorageReference account = new StorageReference(ADDRESS);
+        var account = new StorageReference(ADDRESS);
         KeyPair keys = loadKeys(node, account);
 
         // we create a signer that signs with the private key of our account
