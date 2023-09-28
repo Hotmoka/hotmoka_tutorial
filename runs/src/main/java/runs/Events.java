@@ -56,7 +56,7 @@ import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
 import io.hotmoka.beans.values.StorageValue;
 import io.hotmoka.beans.values.StringValue;
-import io.hotmoka.crypto.Signers;
+import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.NonceHelpers;
@@ -64,7 +64,6 @@ import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.helpers.api.GasHelper;
 import io.hotmoka.helpers.api.NonceHelper;
 import io.hotmoka.node.Accounts;
-import io.hotmoka.node.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.node.api.Node;
 import io.hotmoka.remote.RemoteNode;
 import io.hotmoka.remote.RemoteNodeConfig;
@@ -187,8 +186,8 @@ public class Events {
 		this.node = node;
 		takamakaCode = node.getTakamakaCode();
 		accounts = Stream.of(ADDRESSES).map(StorageReference::new).toArray(StorageReference[]::new);
-		var signature = SignatureAlgorithmForTransactionRequests.of(node.getNameOfSignatureAlgorithmForRequests());
-		signers = Stream.of(accounts).map(this::loadKeys).map(keys -> Signers.with(signature, keys))
+		var signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
+		signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate).map(key -> signature.getSigner(key, SignedTransactionRequest::toByteArrayWithoutSignature))
 			.collect(Collectors.toCollection(ArrayList::new));
 		gasHelper = GasHelpers.of(node);
 		nonceHelper = NonceHelpers.of(node);

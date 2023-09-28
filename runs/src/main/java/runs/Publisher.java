@@ -25,8 +25,8 @@ import java.util.Base64;
 
 import io.hotmoka.constants.Constants;
 import io.hotmoka.crypto.Entropies;
+import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.helpers.InitializedNodes;
-import io.hotmoka.node.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.node.SimpleValidatorsConsensusConfigBuilders;
 import io.hotmoka.node.tendermint.TendermintNodeConfigBuilders;
 import io.hotmoka.node.tendermint.TendermintNodes;
@@ -52,7 +52,7 @@ public class Publisher {
       "/io-takamaka-code-" + Constants.TAKAMAKA_VERSION + ".jar");
 
     // create a key pair for the gamete and compute the Base64-encoding of its public key
-    var signature = SignatureAlgorithmForTransactionRequests.ed25519();
+    var signature = SignatureAlgorithms.ed25519();
     var entropy = Entropies.random();
 	KeyPair keys = entropy.keys("password", signature);
 	var publicKeyBase64 = Base64.getEncoder().encodeToString(signature.encodingOf(keys.getPublic()));

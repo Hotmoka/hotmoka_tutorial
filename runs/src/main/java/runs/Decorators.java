@@ -25,10 +25,10 @@ import java.util.Base64;
 
 import io.hotmoka.constants.Constants;
 import io.hotmoka.crypto.Entropies;
+import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.helpers.AccountsNodes;
 import io.hotmoka.helpers.InitializedNodes;
 import io.hotmoka.helpers.JarsNodes;
-import io.hotmoka.node.SignatureAlgorithmForTransactionRequests;
 import io.hotmoka.node.SimpleConsensusConfigBuilders;
 import io.hotmoka.node.disk.DiskNodeConfigBuilders;
 import io.hotmoka.node.disk.DiskNodes;
@@ -54,7 +54,7 @@ public class Decorators {
     var familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
     // create a key pair for the gamete and compute the Base64-encoding of its public key
-    var signature = SignatureAlgorithmForTransactionRequests.ed25519();
+    var signature = SignatureAlgorithms.ed25519();
 	var entropy = Entropies.random();
 	KeyPair keys = entropy.keys("password", signature);
 	var publicKeyBase64 = Base64.getEncoder().encodeToString(signature.encodingOf(keys.getPublic()));
