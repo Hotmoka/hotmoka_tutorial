@@ -19,7 +19,7 @@
 package runs;
 
 import static io.hotmoka.beans.Coin.panarea;
-import static io.hotmoka.beans.types.BasicTypes.INT;
+import static io.hotmoka.beans.StorageTypes.INT;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
@@ -27,6 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
+import io.hotmoka.beans.StorageTypes;
+import io.hotmoka.beans.api.types.ClassType;
 import io.hotmoka.beans.references.TransactionReference;
 import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
@@ -34,7 +36,6 @@ import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
 import io.hotmoka.beans.signatures.CodeSignature;
 import io.hotmoka.beans.signatures.ConstructorSignature;
-import io.hotmoka.beans.types.ClassType;
 import io.hotmoka.beans.values.BigIntegerValue;
 import io.hotmoka.beans.values.IntValue;
 import io.hotmoka.beans.values.StorageReference;
@@ -44,8 +45,8 @@ import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.node.Accounts;
 import io.hotmoka.node.api.Node;
-import io.hotmoka.remote.RemoteNode;
-import io.hotmoka.remote.RemoteNodeConfig;
+import io.hotmoka.node.remote.RemoteNodeConfigBuilders;
+import io.hotmoka.node.remote.RemoteNodes;
 
 /**
  * Run in the IDE or go inside this project and run
@@ -59,18 +60,18 @@ public class Family2 {
   private final static String
     ADDRESS = "3290de7bdcb50522448a426160581bf3c58cb7480569ecc3358a9800c2477ee1#0";
 
-  private final static ClassType PERSON = new ClassType("io.takamaka.family.Person");
+  private final static ClassType PERSON = StorageTypes.classNamed("io.takamaka.family.Person");
 
   public static void main(String[] args) throws Exception {
 
 	// the path of the user jar to install
     var familyPath = Paths.get("../family_storage/target/family_storage-0.0.1.jar");
 
-    var config = new RemoteNodeConfig.Builder()
+    var config = RemoteNodeConfigBuilders.defaults()
     	.setURL("panarea.hotmoka.io")
     	.build();
 
-    try (var node = RemoteNode.of(config)) {
+    try (var node = RemoteNodes.of(config)) {
     	// we get a reference to where io-takamaka-code-1.0.1.jar has been stored
         TransactionReference takamakaCode = node.getTakamakaCode();
 
@@ -136,7 +137,7 @@ public class Family2 {
             family, // class path for the execution of the transaction
 
             // constructor Person(String,int,int,int)
-            new ConstructorSignature(PERSON, ClassType.STRING, INT, INT, INT),
+            new ConstructorSignature(PERSON, StorageTypes.STRING, INT, INT, INT),
 
             // actual arguments
             new StringValue("Albert Einstein"), new IntValue(14),

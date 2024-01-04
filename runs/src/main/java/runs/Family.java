@@ -38,8 +38,8 @@ import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.node.Accounts;
 import io.hotmoka.node.api.Node;
-import io.hotmoka.remote.RemoteNode;
-import io.hotmoka.remote.RemoteNodeConfig;
+import io.hotmoka.node.remote.RemoteNodeConfigBuilders;
+import io.hotmoka.node.remote.RemoteNodes;
 
 /**
  * Run in the IDE or go inside this project and run
@@ -58,11 +58,11 @@ public class Family {
 	// the path of the user jar to install
     var familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
-    var config = new RemoteNodeConfig.Builder()
+    var config = RemoteNodeConfigBuilders.defaults()
     	.setURL("panarea.hotmoka.io")
     	.build();
 
-    try (var node = RemoteNode.of(config)) {
+    try (var node = RemoteNodes.of(config)) {
     	// we get a reference to where io-takamaka-code-1.0.1.jar has been stored
         TransactionReference takamakaCode = node.getTakamakaCode();
 

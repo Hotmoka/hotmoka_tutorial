@@ -33,28 +33,28 @@
   <dependencies>
     <dependency>
       <groupId>io.hotmoka</groupId>
-      <artifactId>io-hotmoka-remote</artifactId>
-      <version>1.3.0</version>
+      <artifactId>io-hotmoka-node-remote</artifactId>
+      <version>1.4.0</version>
     </dependency>
     <dependency>
       <groupId>io.hotmoka</groupId>
       <artifactId>io-hotmoka-helpers</artifactId>
-      <version>1.3.0</version>
+      <version>1.4.0</version>
     </dependency>
 	<dependency>
       <groupId>io.hotmoka</groupId>
       <artifactId>io-hotmoka-node-tendermint</artifactId>
-      <version>1.3.0</version>
+      <version>1.4.0</version>
     </dependency>
     <dependency>
       <groupId>io.hotmoka</groupId>
       <artifactId>io-hotmoka-node-disk</artifactId>
-      <version>1.3.0</version>
+      <version>1.4.0</version>
     </dependency>
     <dependency>
       <groupId>io.hotmoka</groupId>
-      <artifactId>io-hotmoka-service</artifactId>
-      <version>1.3.0</version>
+      <artifactId>io-hotmoka-node-service</artifactId>
+      <version>1.4.0</version>
     </dependency>
   </dependencies>
 

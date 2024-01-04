@@ -19,12 +19,12 @@
 package runs;
 
 import static io.hotmoka.beans.Coin.panarea;
-import static io.hotmoka.beans.types.BasicTypes.BOOLEAN;
-import static io.hotmoka.beans.types.BasicTypes.BYTE;
-import static io.hotmoka.beans.types.BasicTypes.INT;
-import static io.hotmoka.beans.types.ClassType.BIG_INTEGER;
-import static io.hotmoka.beans.types.ClassType.BYTES32_SNAPSHOT;
-import static io.hotmoka.beans.types.ClassType.PAYABLE_CONTRACT;
+import static io.hotmoka.beans.StorageTypes.BIG_INTEGER;
+import static io.hotmoka.beans.StorageTypes.BOOLEAN;
+import static io.hotmoka.beans.StorageTypes.BYTE;
+import static io.hotmoka.beans.StorageTypes.BYTES32_SNAPSHOT;
+import static io.hotmoka.beans.StorageTypes.INT;
+import static io.hotmoka.beans.StorageTypes.PAYABLE_CONTRACT;
 
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -38,6 +38,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.hotmoka.beans.StorageTypes;
+import io.hotmoka.beans.api.types.ClassType;
 import io.hotmoka.beans.references.TransactionReference;
 import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
@@ -48,7 +50,6 @@ import io.hotmoka.beans.signatures.ConstructorSignature;
 import io.hotmoka.beans.signatures.MethodSignature;
 import io.hotmoka.beans.signatures.NonVoidMethodSignature;
 import io.hotmoka.beans.signatures.VoidMethodSignature;
-import io.hotmoka.beans.types.ClassType;
 import io.hotmoka.beans.values.BigIntegerValue;
 import io.hotmoka.beans.values.BooleanValue;
 import io.hotmoka.beans.values.ByteValue;
@@ -65,8 +66,8 @@ import io.hotmoka.helpers.api.GasHelper;
 import io.hotmoka.helpers.api.NonceHelper;
 import io.hotmoka.node.Accounts;
 import io.hotmoka.node.api.Node;
-import io.hotmoka.remote.RemoteNode;
-import io.hotmoka.remote.RemoteNodeConfig;
+import io.hotmoka.node.remote.RemoteNodeConfigBuilders;
+import io.hotmoka.node.remote.RemoteNodes;
 
 /**
  * Run in the IDE or go inside this project and run
@@ -92,7 +93,7 @@ public class Events {
 	private final static BigInteger _500_000 = BigInteger.valueOf(500_000);
 
 	private final static ClassType BLIND_AUCTION
-	  = new ClassType("io.takamaka.auction.BlindAuction");
+	  = StorageTypes.classNamed("io.takamaka.auction.BlindAuction");
 	private final static ConstructorSignature CONSTRUCTOR_BLIND_AUCTION
 	  = new ConstructorSignature(BLIND_AUCTION, INT, INT);
 	private final static ConstructorSignature CONSTRUCTOR_BYTES32_SNAPSHOT
@@ -103,12 +104,12 @@ public class Events {
 			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE);
 	private final static ConstructorSignature CONSTRUCTOR_REVEALED_BID
 	  = new ConstructorSignature(
-			new ClassType("io.takamaka.auction.BlindAuction$RevealedBid"),
+		    StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"),
 			BIG_INTEGER, BOOLEAN, BYTES32_SNAPSHOT);
 	private final static MethodSignature BID = new VoidMethodSignature
 			(BLIND_AUCTION, "bid", BIG_INTEGER, BYTES32_SNAPSHOT);
 	private final static MethodSignature REVEAL = new VoidMethodSignature
-			(BLIND_AUCTION, "reveal", new ClassType("io.takamaka.auction.BlindAuction$RevealedBid"));
+			(BLIND_AUCTION, "reveal", StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"));
 	private final static MethodSignature AUCTION_END = new NonVoidMethodSignature
 			(BLIND_AUCTION, "auctionEnd", PAYABLE_CONTRACT);
 
@@ -129,11 +130,11 @@ public class Events {
 	private final NonceHelper nonceHelper;
 
 	public static void main(String[] args) throws Exception {
-		var config = new RemoteNodeConfig.Builder()
+		var config = RemoteNodeConfigBuilders.defaults()
 			.setURL("panarea.hotmoka.io")
 			.build();
 
-		try (var node = RemoteNode.of(config)) {
+		try (var node = RemoteNodes.of(config)) {
 			new Events(node);
 		}
 	}
@@ -198,7 +199,7 @@ public class Events {
 
 		try (var subscription = node.subscribeToEvents(auction,
 				(creator, event) -> System.out.println
-				("Seen event of class " + node.getClassTag(event).clazz.name
+				("Seen event of class " + node.getClassTag(event).clazz.getName()
 						+ " created by contract " + creator))) {
 
 			StorageReference expectedWinner = placeBids();
