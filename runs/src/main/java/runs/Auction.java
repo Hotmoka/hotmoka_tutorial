@@ -25,6 +25,7 @@ import static io.hotmoka.beans.StorageTypes.BYTE;
 import static io.hotmoka.beans.StorageTypes.BYTES32_SNAPSHOT;
 import static io.hotmoka.beans.StorageTypes.INT;
 import static io.hotmoka.beans.StorageTypes.PAYABLE_CONTRACT;
+import static io.hotmoka.beans.StorageValues.byteOf;
 
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -38,25 +39,23 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.hotmoka.beans.ConstructorSignatures;
+import io.hotmoka.beans.MethodSignatures;
 import io.hotmoka.beans.StorageTypes;
+import io.hotmoka.beans.StorageValues;
+import io.hotmoka.beans.api.signatures.ConstructorSignature;
+import io.hotmoka.beans.api.transactions.TransactionReference;
 import io.hotmoka.beans.api.types.ClassType;
-import io.hotmoka.beans.references.TransactionReference;
+import io.hotmoka.beans.api.values.StorageReference;
+import io.hotmoka.beans.api.values.StorageValue;
+import io.hotmoka.beans.api.values.StringValue;
 import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
-import io.hotmoka.beans.signatures.CodeSignature;
-import io.hotmoka.beans.signatures.ConstructorSignature;
 import io.hotmoka.beans.signatures.MethodSignature;
 import io.hotmoka.beans.signatures.NonVoidMethodSignature;
 import io.hotmoka.beans.signatures.VoidMethodSignature;
-import io.hotmoka.beans.values.BigIntegerValue;
-import io.hotmoka.beans.values.BooleanValue;
-import io.hotmoka.beans.values.ByteValue;
-import io.hotmoka.beans.values.IntValue;
-import io.hotmoka.beans.values.StorageReference;
-import io.hotmoka.beans.values.StorageValue;
-import io.hotmoka.beans.values.StringValue;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
@@ -95,15 +94,15 @@ public class Auction {
 	private final static ClassType BLIND_AUCTION
 	  = StorageTypes.classNamed("io.takamaka.auction.BlindAuction");
 	private final static ConstructorSignature CONSTRUCTOR_BLIND_AUCTION
-	  = new ConstructorSignature(BLIND_AUCTION, INT, INT);
+	  = ConstructorSignatures.of(BLIND_AUCTION, INT, INT);
 	private final static ConstructorSignature CONSTRUCTOR_BYTES32_SNAPSHOT
-	  = new ConstructorSignature(BYTES32_SNAPSHOT,
+	  = ConstructorSignatures.of(BYTES32_SNAPSHOT,
 			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
 			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
 			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
 			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE);
 	private final static ConstructorSignature CONSTRUCTOR_REVEALED_BID
-	  = new ConstructorSignature(
+	  = ConstructorSignatures.of(
 			StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"),
 			BIG_INTEGER, BOOLEAN, BYTES32_SNAPSHOT);
 	private final static MethodSignature BID = new VoidMethodSignature
@@ -167,27 +166,27 @@ public class Auction {
 				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
 				panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
-				new ByteValue(salt[0]), new ByteValue(salt[1]), new ByteValue(salt[2]), new ByteValue(salt[3]),
-				new ByteValue(salt[4]), new ByteValue(salt[5]), new ByteValue(salt[6]), new ByteValue(salt[7]),
-				new ByteValue(salt[8]), new ByteValue(salt[9]), new ByteValue(salt[10]), new ByteValue(salt[11]),
-				new ByteValue(salt[12]), new ByteValue(salt[13]), new ByteValue(salt[14]), new ByteValue(salt[15]),
-				new ByteValue(salt[16]), new ByteValue(salt[17]), new ByteValue(salt[18]), new ByteValue(salt[19]),
-				new ByteValue(salt[20]), new ByteValue(salt[21]), new ByteValue(salt[22]), new ByteValue(salt[23]),
-				new ByteValue(salt[24]), new ByteValue(salt[25]), new ByteValue(salt[26]), new ByteValue(salt[27]),
-				new ByteValue(salt[28]), new ByteValue(salt[29]), new ByteValue(salt[30]), new ByteValue(salt[31])));
+				byteOf(salt[0]), byteOf(salt[1]), byteOf(salt[2]), byteOf(salt[3]),
+				byteOf(salt[4]), byteOf(salt[5]), byteOf(salt[6]), byteOf(salt[7]),
+				byteOf(salt[8]), byteOf(salt[9]), byteOf(salt[10]), byteOf(salt[11]),
+				byteOf(salt[12]), byteOf(salt[13]), byteOf(salt[14]), byteOf(salt[15]),
+				byteOf(salt[16]), byteOf(salt[17]), byteOf(salt[18]), byteOf(salt[19]),
+				byteOf(salt[20]), byteOf(salt[21]), byteOf(salt[22]), byteOf(salt[23]),
+				byteOf(salt[24]), byteOf(salt[25]), byteOf(salt[26]), byteOf(salt[27]),
+				byteOf(salt[28]), byteOf(salt[29]), byteOf(salt[30]), byteOf(salt[31])));
 
 			return node.addConstructorCallTransaction(new ConstructorCallTransactionRequest
 				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId,
 				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_REVEALED_BID,
-				new BigIntegerValue(value), new BooleanValue(fake), bytes32));
+				StorageValues.bigIntegerOf(value), StorageValues.booleanOf(fake), bytes32));
 		}
 	}
 
 	private Auction(Node node) throws Exception {
 		this.node = node;
 		takamakaCode = node.getTakamakaCode();
-		accounts = Stream.of(ADDRESSES).map(StorageReference::new).toArray(StorageReference[]::new);
+		accounts = Stream.of(ADDRESSES).map(StorageValues::reference).toArray(StorageReference[]::new);
 		var signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
 		signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate).map(key -> signature.getSigner(key, SignedTransactionRequest::toByteArrayWithoutSignature))
 			.collect(Collectors.toCollection(ArrayList::new));
@@ -216,7 +215,7 @@ public class Auction {
 			(new ConstructorCallTransactionRequest(signers.get(0), accounts[0],
 			nonceHelper.getNonceOf(accounts[0]), chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
 			classpath, CONSTRUCTOR_BLIND_AUCTION,
-			new IntValue(BIDDING_TIME), new IntValue(REVEAL_TIME)));
+			StorageValues.intOf(BIDDING_TIME), StorageValues.intOf(REVEAL_TIME)));
 	}
 
 	private String getChainId() throws Exception {
@@ -224,9 +223,9 @@ public class Auction {
 			(accounts[0], // payer
 			BigInteger.valueOf(50_000), // gas limit
 			takamakaCode, // class path for the execution of the transaction
-			CodeSignature.GET_CHAIN_ID, // method
+			MethodSignatures.GET_CHAIN_ID, // method
 			node.getManifest()))) // receiver of the method call
-			.value;
+			.getValue();
 	}
 
 	private TransactionReference installJar() throws Exception {
@@ -282,7 +281,7 @@ public class Auction {
 				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId,
 				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, BID,
-				auction, new BigIntegerValue(deposit), bytes32));
+				auction, StorageValues.bigIntegerOf(deposit), bytes32));
 
 			i++;
 		}
@@ -358,22 +357,22 @@ public class Auction {
 			nonceHelper.getNonceOf(accounts[player]), chainId,
 			_500_000, panarea(gasHelper.getSafeGasPrice()),
 			classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
-			new ByteValue(hash[0]), new ByteValue(hash[1]),
-			new ByteValue(hash[2]), new ByteValue(hash[3]),
-			new ByteValue(hash[4]), new ByteValue(hash[5]),
-			new ByteValue(hash[6]), new ByteValue(hash[7]),
-			new ByteValue(hash[8]), new ByteValue(hash[9]),
-			new ByteValue(hash[10]), new ByteValue(hash[11]),
-			new ByteValue(hash[12]), new ByteValue(hash[13]),
-			new ByteValue(hash[14]), new ByteValue(hash[15]),
-			new ByteValue(hash[16]), new ByteValue(hash[17]),
-			new ByteValue(hash[18]), new ByteValue(hash[19]),
-			new ByteValue(hash[20]), new ByteValue(hash[21]),
-			new ByteValue(hash[22]), new ByteValue(hash[23]),
-			new ByteValue(hash[24]), new ByteValue(hash[25]),
-			new ByteValue(hash[26]), new ByteValue(hash[27]),
-			new ByteValue(hash[28]), new ByteValue(hash[29]),
-			new ByteValue(hash[30]), new ByteValue(hash[31])));
+			byteOf(hash[0]), byteOf(hash[1]),
+			byteOf(hash[2]), byteOf(hash[3]),
+			byteOf(hash[4]), byteOf(hash[5]),
+			byteOf(hash[6]), byteOf(hash[7]),
+			byteOf(hash[8]), byteOf(hash[9]),
+			byteOf(hash[10]), byteOf(hash[11]),
+			byteOf(hash[12]), byteOf(hash[13]),
+			byteOf(hash[14]), byteOf(hash[15]),
+			byteOf(hash[16]), byteOf(hash[17]),
+			byteOf(hash[18]), byteOf(hash[19]),
+			byteOf(hash[20]), byteOf(hash[21]),
+			byteOf(hash[22]), byteOf(hash[23]),
+			byteOf(hash[24]), byteOf(hash[25]),
+			byteOf(hash[26]), byteOf(hash[27]),
+			byteOf(hash[28]), byteOf(hash[29]),
+			byteOf(hash[30]), byteOf(hash[31])));
 	}
 
 	private KeyPair loadKeys(StorageReference account) {

@@ -27,21 +27,21 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
+import io.hotmoka.beans.ConstructorSignatures;
+import io.hotmoka.beans.MethodSignatures;
 import io.hotmoka.beans.StorageTypes;
+import io.hotmoka.beans.StorageValues;
+import io.hotmoka.beans.api.transactions.TransactionReference;
 import io.hotmoka.beans.api.types.ClassType;
-import io.hotmoka.beans.references.TransactionReference;
+import io.hotmoka.beans.api.values.BigIntegerValue;
+import io.hotmoka.beans.api.values.StorageReference;
+import io.hotmoka.beans.api.values.StorageValue;
+import io.hotmoka.beans.api.values.StringValue;
 import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
-import io.hotmoka.beans.signatures.CodeSignature;
-import io.hotmoka.beans.signatures.ConstructorSignature;
 import io.hotmoka.beans.signatures.NonVoidMethodSignature;
-import io.hotmoka.beans.values.BigIntegerValue;
-import io.hotmoka.beans.values.IntValue;
-import io.hotmoka.beans.values.StorageReference;
-import io.hotmoka.beans.values.StorageValue;
-import io.hotmoka.beans.values.StringValue;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.SignatureAlgorithm;
 import io.hotmoka.helpers.GasHelpers;
@@ -81,7 +81,7 @@ public class Family3 {
         // we get the signing algorithm to use for requests
         SignatureAlgorithm signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
 
-        var account = new StorageReference(ADDRESS);
+        var account = StorageValues.reference(ADDRESS);
         KeyPair keys = loadKeys(node, account);
 
         // we create a signer that signs with the private key of our account
@@ -95,9 +95,9 @@ public class Family3 {
             (account, // payer
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
-            CodeSignature.NONCE, // method
+            MethodSignatures.NONCE, // method
             account))) // receiver of the method call
-          .value;
+          .getValue();
 
         // we get the chain identifier of the network
         String chainId = ((StringValue) node
@@ -105,9 +105,9 @@ public class Family3 {
             (account, // payer
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
-            CodeSignature.GET_CHAIN_ID, // method
+            MethodSignatures.GET_CHAIN_ID, // method
             node.getManifest()))) // receiver of the method call
-          .value;
+          .getValue();
 
         var gasHelper = GasHelpers.of(node);
 
@@ -140,11 +140,11 @@ public class Family3 {
             family, // class path for the execution of the transaction
 
             // constructor Person(String,int,int,int)
-            new ConstructorSignature(PERSON, StorageTypes.STRING, INT, INT, INT),
+            ConstructorSignatures.of(PERSON, StorageTypes.STRING, INT, INT, INT),
 
             // actual arguments
-            new StringValue("Albert Einstein"), new IntValue(14),
-            new IntValue(4), new IntValue(1879)
+            StorageValues.stringOf("Albert Einstein"), StorageValues.intOf(14),
+            StorageValues.intOf(4), StorageValues.intOf(1879)
         ));
 
         // we increase our copy of the nonce, ready for further
