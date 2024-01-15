@@ -44,6 +44,7 @@ import io.hotmoka.beans.MethodSignatures;
 import io.hotmoka.beans.StorageTypes;
 import io.hotmoka.beans.StorageValues;
 import io.hotmoka.beans.api.signatures.ConstructorSignature;
+import io.hotmoka.beans.api.signatures.MethodSignature;
 import io.hotmoka.beans.api.transactions.TransactionReference;
 import io.hotmoka.beans.api.types.ClassType;
 import io.hotmoka.beans.api.values.StorageReference;
@@ -53,9 +54,7 @@ import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
-import io.hotmoka.beans.signatures.MethodSignature;
 import io.hotmoka.beans.signatures.NonVoidMethodSignature;
-import io.hotmoka.beans.signatures.VoidMethodSignature;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
@@ -105,9 +104,9 @@ public class Events {
 	  = ConstructorSignatures.of(
 		    StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"),
 			BIG_INTEGER, BOOLEAN, BYTES32_SNAPSHOT);
-	private final static MethodSignature BID = new VoidMethodSignature
+	private final static MethodSignature BID = MethodSignatures.ofVoid
 			(BLIND_AUCTION, "bid", BIG_INTEGER, BYTES32_SNAPSHOT);
-	private final static MethodSignature REVEAL = new VoidMethodSignature
+	private final static MethodSignature REVEAL = MethodSignatures.ofVoid
 			(BLIND_AUCTION, "reveal", StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"));
 	private final static MethodSignature AUCTION_END = new NonVoidMethodSignature
 			(BLIND_AUCTION, "auctionEnd", PAYABLE_CONTRACT);
