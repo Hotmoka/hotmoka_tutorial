@@ -41,7 +41,6 @@ import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
-import io.hotmoka.beans.signatures.NonVoidMethodSignature;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.SignatureAlgorithm;
 import io.hotmoka.helpers.GasHelpers;
@@ -162,7 +161,7 @@ public class Family3 {
              family, // class path for the execution of the transaction
 
       	     // method to call: String Person.toString()
-        	 new NonVoidMethodSignature(PERSON, "toString", StorageTypes.STRING),
+             MethodSignatures.of(PERSON, "toString", StorageTypes.STRING),
 
         	 // receiver of the method to call
              albert

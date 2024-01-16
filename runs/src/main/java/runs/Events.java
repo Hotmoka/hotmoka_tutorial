@@ -54,7 +54,6 @@ import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
 import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
 import io.hotmoka.beans.requests.JarStoreTransactionRequest;
 import io.hotmoka.beans.requests.SignedTransactionRequest;
-import io.hotmoka.beans.signatures.NonVoidMethodSignature;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
@@ -108,7 +107,7 @@ public class Events {
 			(BLIND_AUCTION, "bid", BIG_INTEGER, BYTES32_SNAPSHOT);
 	private final static MethodSignature REVEAL = MethodSignatures.ofVoid
 			(BLIND_AUCTION, "reveal", StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"));
-	private final static MethodSignature AUCTION_END = new NonVoidMethodSignature
+	private final static MethodSignature AUCTION_END = MethodSignatures.of
 			(BLIND_AUCTION, "auctionEnd", PAYABLE_CONTRACT);
 
 	// the hashing algorithm used to hide the bids
