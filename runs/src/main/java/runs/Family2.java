@@ -18,8 +18,8 @@
 
 package runs;
 
-import static io.hotmoka.beans.Coin.panarea;
 import static io.hotmoka.beans.StorageTypes.INT;
+import static io.hotmoka.helpers.Coin.panarea;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;

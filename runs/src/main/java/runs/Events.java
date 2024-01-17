@@ -18,7 +18,6 @@
 
 package runs;
 
-import static io.hotmoka.beans.Coin.panarea;
 import static io.hotmoka.beans.StorageTypes.BIG_INTEGER;
 import static io.hotmoka.beans.StorageTypes.BOOLEAN;
 import static io.hotmoka.beans.StorageTypes.BYTE;
@@ -26,6 +25,7 @@ import static io.hotmoka.beans.StorageTypes.BYTES32_SNAPSHOT;
 import static io.hotmoka.beans.StorageTypes.INT;
 import static io.hotmoka.beans.StorageTypes.PAYABLE_CONTRACT;
 import static io.hotmoka.beans.StorageValues.byteOf;
+import static io.hotmoka.helpers.Coin.panarea;
 
 import java.math.BigInteger;
 import java.nio.file.Files;
