@@ -27,14 +27,14 @@ import java.security.KeyPair;
 
 import io.hotmoka.beans.MethodSignatures;
 import io.hotmoka.beans.StorageValues;
+import io.hotmoka.beans.TransactionRequests;
+import io.hotmoka.beans.api.requests.SignedTransactionRequest;
 import io.hotmoka.beans.api.transactions.TransactionReference;
 import io.hotmoka.beans.api.values.BigIntegerValue;
 import io.hotmoka.beans.api.values.StorageReference;
 import io.hotmoka.beans.api.values.StringValue;
-import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
-import io.hotmoka.beans.requests.JarStoreTransactionRequest;
-import io.hotmoka.beans.requests.SignedTransactionRequest;
 import io.hotmoka.crypto.SignatureAlgorithms;
+import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.node.Accounts;
@@ -74,13 +74,14 @@ public class Family {
         KeyPair keys = loadKeys(node, account);
 
         // we create a signer that signs with the private key of our account
-        var signer = signature.getSigner(keys.getPrivate(), SignedTransactionRequest::toByteArrayWithoutSignature);
+        Signer<SignedTransactionRequest<?>> signer = signature.getSigner
+          (keys.getPrivate(), SignedTransactionRequest::toByteArrayWithoutSignature);
 
         // we get the nonce of our account: we use the account itself as caller and
         // an arbitrary nonce (ZERO in the code) since we are running
         // a @View method of the account
         BigInteger nonce = ((BigIntegerValue) node
-          .runInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
+          .runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
             (account, // payer
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
@@ -90,7 +91,7 @@ public class Family {
 
         // we get the chain identifier of the network
         String chainId = ((StringValue) node
-          .runInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
+          .runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
             (account, // payer
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
@@ -102,7 +103,7 @@ public class Family {
 
         // we install family-0.0.1-SNAPSHOT.jar in the node: our account will pay
         TransactionReference family = node
-          .addJarStoreTransaction(new JarStoreTransactionRequest
+          .addJarStoreTransaction(TransactionRequests.jarStore
             (signer, // an object that signs with the payer's private key
             account, // payer
             nonce, // payer's nonce: relevant since this is not a call to a @View method!

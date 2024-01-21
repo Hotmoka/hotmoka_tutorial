@@ -36,6 +36,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,6 +44,8 @@ import io.hotmoka.beans.ConstructorSignatures;
 import io.hotmoka.beans.MethodSignatures;
 import io.hotmoka.beans.StorageTypes;
 import io.hotmoka.beans.StorageValues;
+import io.hotmoka.beans.TransactionRequests;
+import io.hotmoka.beans.api.requests.SignedTransactionRequest;
 import io.hotmoka.beans.api.signatures.ConstructorSignature;
 import io.hotmoka.beans.api.signatures.MethodSignature;
 import io.hotmoka.beans.api.transactions.TransactionReference;
@@ -50,10 +53,6 @@ import io.hotmoka.beans.api.types.ClassType;
 import io.hotmoka.beans.api.values.StorageReference;
 import io.hotmoka.beans.api.values.StorageValue;
 import io.hotmoka.beans.api.values.StringValue;
-import io.hotmoka.beans.requests.ConstructorCallTransactionRequest;
-import io.hotmoka.beans.requests.InstanceMethodCallTransactionRequest;
-import io.hotmoka.beans.requests.JarStoreTransactionRequest;
-import io.hotmoka.beans.requests.SignedTransactionRequest;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
@@ -116,7 +115,7 @@ public class Events {
 	private final Path auctionPath = Paths.get("../auction_events/target/auction_events-0.0.1.jar");
 	private final TransactionReference takamakaCode;
 	private final StorageReference[] accounts;
-	private final List<Signer<SignedTransactionRequest>> signers;
+	private final List<Signer<SignedTransactionRequest<?>>> signers;
 	private final String chainId;
 	private final long start;  // the time when bids started being placed
 	private final Node node;
@@ -159,7 +158,7 @@ public class Events {
 		 * @return the storage reference to the freshly created revealed bid
 		 */
 		private StorageReference intoBlockchain() throws Exception {
-			StorageReference bytes32 = node.addConstructorCallTransaction(new ConstructorCallTransactionRequest
+			StorageReference bytes32 = node.addConstructorCallTransaction(TransactionRequests.constructorCall
 				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
 				panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
@@ -172,7 +171,7 @@ public class Events {
 				byteOf(salt[24]), byteOf(salt[25]), byteOf(salt[26]), byteOf(salt[27]),
 				byteOf(salt[28]), byteOf(salt[29]), byteOf(salt[30]), byteOf(salt[31])));
 
-			return node.addConstructorCallTransaction(new ConstructorCallTransactionRequest
+			return node.addConstructorCallTransaction(TransactionRequests.constructorCall
 				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId,
 				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_REVEALED_BID,
@@ -185,7 +184,9 @@ public class Events {
 		takamakaCode = node.getTakamakaCode();
 		accounts = Stream.of(ADDRESSES).map(StorageValues::reference).toArray(StorageReference[]::new);
 		var signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
-		signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate).map(key -> signature.getSigner(key, SignedTransactionRequest::toByteArrayWithoutSignature))
+		Function<SignedTransactionRequest<?>, byte[]> hasher = SignedTransactionRequest<?>::toByteArrayWithoutSignature;
+		signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate)
+			.map(key -> signature.getSigner(key, hasher))
 			.collect(Collectors.toCollection(ArrayList::new));
 		gasHelper = GasHelpers.of(node);
 		nonceHelper = NonceHelpers.of(node);
@@ -196,7 +197,7 @@ public class Events {
 
 		try (var subscription = node.subscribeToEvents(auction,
 				(creator, event) -> System.out.println
-				("Seen event of class " + node.getClassTag(event).clazz.getName()
+				("Seen event of class " + node.getClassTag(event).getClazz().getName()
 						+ " created by contract " + creator))) {
 
 			StorageReference expectedWinner = placeBids();
@@ -215,14 +216,14 @@ public class Events {
 		System.out.println("Creating contract");
 
 		return node.addConstructorCallTransaction
-			(new ConstructorCallTransactionRequest(signers.get(0), accounts[0],
+			(TransactionRequests.constructorCall(signers.get(0), accounts[0],
 			nonceHelper.getNonceOf(accounts[0]), chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
 			classpath, CONSTRUCTOR_BLIND_AUCTION,
 			StorageValues.intOf(BIDDING_TIME), StorageValues.intOf(REVEAL_TIME)));
 	}
 
 	private String getChainId() throws Exception {
-		return ((StringValue) node.runInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
+		return ((StringValue) node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
 			(accounts[0], // payer
 			BigInteger.valueOf(50_000), // gas limit
 			takamakaCode, // class path for the execution of the transaction
@@ -234,7 +235,7 @@ public class Events {
 	private TransactionReference installJar() throws Exception {
 		System.out.println("Installing jar");
 
-		return node.addJarStoreTransaction(new JarStoreTransactionRequest
+		return node.addJarStoreTransaction(TransactionRequests.jarStore
 			(signers.get(0), // an object that signs with the payer's private key
 			accounts[0], // payer
 			nonceHelper.getNonceOf(accounts[0]), // payer's nonce
@@ -280,7 +281,7 @@ public class Events {
 			bids.add(new BidToReveal(player, value, fake, salt));
 
 			// place a hashed bid in the node
-			node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
+			node.addInstanceMethodCallTransaction(TransactionRequests.instanceMethodCall
 				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId,
 				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, BID,
@@ -299,7 +300,7 @@ public class Events {
 			System.out.println("Revealing bid " + counter++ + " out of " + bids.size());
 			int player = bid.player;
 			StorageReference bidInBlockchain = bid.intoBlockchain();
-			node.addInstanceMethodCallTransaction(new InstanceMethodCallTransactionRequest
+			node.addInstanceMethodCallTransaction(TransactionRequests.instanceMethodCall
 				(signers.get(player), accounts[player],
 				nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
 				panarea(gasHelper.getSafeGasPrice()),
@@ -309,7 +310,7 @@ public class Events {
 
 	private StorageReference askForWinner() throws Exception {
 		StorageValue winner = node.addInstanceMethodCallTransaction
-			(new InstanceMethodCallTransactionRequest
+			(TransactionRequests.instanceMethodCall
 			(signers.get(0), accounts[0], nonceHelper.getNonceOf(accounts[0]),
 			chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
 			classpath, AUCTION_END, auction));
@@ -354,7 +355,7 @@ public class Events {
 	 */
 	private StorageReference createBytes32(int player, byte[] hash) throws Exception {
 		return node.addConstructorCallTransaction
-			(new ConstructorCallTransactionRequest(
+			(TransactionRequests.constructorCall(
 			signers.get(player),
 			accounts[player],
 			nonceHelper.getNonceOf(accounts[player]), chainId,
