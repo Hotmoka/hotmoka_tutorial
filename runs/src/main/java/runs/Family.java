@@ -52,7 +52,7 @@ public class Family {
 
   // change this with your account's storage reference
   private final static String
-    ADDRESS = "3290de7bdcb50522448a426160581bf3c58cb7480569ecc3358a9800c2477ee1#0";
+    ADDRESS = "72f31eb48f3d0bf9be4e37f184024c16c016e87a20b94ce8744f298094a1cae9#0";
 
   public static void main(String[] args) throws Exception {
 

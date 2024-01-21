@@ -59,13 +59,13 @@ public class Family3 {
 
   // change this with your account's storage reference
   private final static String
-    ADDRESS = "3290de7bdcb50522448a426160581bf3c58cb7480569ecc3358a9800c2477ee1#0";
+    ADDRESS = "72f31eb48f3d0bf9be4e37f184024c16c016e87a20b94ce8744f298094a1cae9#0";
 
   private final static ClassType PERSON = StorageTypes.classNamed("io.takamaka.family.Person");
 
   public static void main(String[] args) throws Exception {
 
-	// the path of the user jar to install
+    // the path of the user jar to install
     var familyPath = Paths.get("../family_exported/target/family_exported-0.0.1.jar");
 
     var config = RemoteNodeConfigBuilders.defaults()

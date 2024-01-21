@@ -72,327 +72,327 @@ import io.hotmoka.node.remote.RemoteNodes;
  * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Events
  */
 public class Events {
-	// change this with your accounts' storage references
-	
-	private final static String[] ADDRESSES = new String[3];
-	
-	static {
-		ADDRESSES[0] = "3290de7bdcb50522448a426160581bf3c58cb7480569ecc3358a9800c2477ee1#0";
-		ADDRESSES[1] = "ab03328645589defeb289fd49a5fa7b6d41d1475d307565717b568e4cd4e7bec#0";
-		ADDRESSES[2] = "b9372abbd001a7588a0a2d0b9bcca6aee5c9fc943b0227e664c5f1f53bc2d443#0";
-	}
+  // change this with your accounts' storage references
+  
+  private final static String[] ADDRESSES = new String[3];
+  
+  static {
+    ADDRESSES[0] = "72f31eb48f3d0bf9be4e37f184024c16c016e87a20b94ce8744f298094a1cae9#0";
+    ADDRESSES[1] = "e867762273c7517af2bb6dc89eaca1baf9e945e99a0c24cfca08c51852f3a39a#0";
+    ADDRESSES[2] = "b49cbb39829929ebf4d140ba9e3481b0e9e3c27d543b9fe21e85880d6d554416#0";
+  }
 
-	public final static int NUM_BIDS = 10; // number of bids placed
-	public final static int BIDDING_TIME = 130_000; // in milliseconds
-	public final static int REVEAL_TIME = 170_000; // in milliseconds
+  public final static int NUM_BIDS = 10; // number of bids placed
+  public final static int BIDDING_TIME = 130_000; // in milliseconds
+  public final static int REVEAL_TIME = 170_000; // in milliseconds
 
-	private final static BigInteger _500_000 = BigInteger.valueOf(500_000);
+  private final static BigInteger _500_000 = BigInteger.valueOf(500_000);
 
-	private final static ClassType BLIND_AUCTION
-	  = StorageTypes.classNamed("io.takamaka.auction.BlindAuction");
-	private final static ConstructorSignature CONSTRUCTOR_BLIND_AUCTION
-	  = ConstructorSignatures.of(BLIND_AUCTION, INT, INT);
-	private final static ConstructorSignature CONSTRUCTOR_BYTES32_SNAPSHOT
-	  = ConstructorSignatures.of(BYTES32_SNAPSHOT,
-			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
-			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
-			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
-			BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE);
-	private final static ConstructorSignature CONSTRUCTOR_REVEALED_BID
-	  = ConstructorSignatures.of(
-		    StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"),
-			BIG_INTEGER, BOOLEAN, BYTES32_SNAPSHOT);
-	private final static MethodSignature BID = MethodSignatures.ofVoid
-			(BLIND_AUCTION, "bid", BIG_INTEGER, BYTES32_SNAPSHOT);
-	private final static MethodSignature REVEAL = MethodSignatures.ofVoid
-			(BLIND_AUCTION, "reveal", StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"));
-	private final static MethodSignature AUCTION_END = MethodSignatures.of
-			(BLIND_AUCTION, "auctionEnd", PAYABLE_CONTRACT);
+  private final static ClassType BLIND_AUCTION
+    = StorageTypes.classNamed("io.takamaka.auction.BlindAuction");
+  private final static ConstructorSignature CONSTRUCTOR_BLIND_AUCTION
+    = ConstructorSignatures.of(BLIND_AUCTION, INT, INT);
+  private final static ConstructorSignature CONSTRUCTOR_BYTES32_SNAPSHOT
+    = ConstructorSignatures.of(BYTES32_SNAPSHOT,
+      BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
+      BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
+      BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE,
+      BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE, BYTE);
+  private final static ConstructorSignature CONSTRUCTOR_REVEALED_BID
+    = ConstructorSignatures.of(
+        StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"),
+      BIG_INTEGER, BOOLEAN, BYTES32_SNAPSHOT);
+  private final static MethodSignature BID = MethodSignatures.ofVoid
+      (BLIND_AUCTION, "bid", BIG_INTEGER, BYTES32_SNAPSHOT);
+  private final static MethodSignature REVEAL = MethodSignatures.ofVoid
+      (BLIND_AUCTION, "reveal", StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"));
+  private final static MethodSignature AUCTION_END = MethodSignatures.of
+      (BLIND_AUCTION, "auctionEnd", PAYABLE_CONTRACT);
 
-	// the hashing algorithm used to hide the bids
-	private final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+  // the hashing algorithm used to hide the bids
+  private final MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-	private final Path auctionPath = Paths.get("../auction_events/target/auction_events-0.0.1.jar");
-	private final TransactionReference takamakaCode;
-	private final StorageReference[] accounts;
-	private final List<Signer<SignedTransactionRequest<?>>> signers;
-	private final String chainId;
-	private final long start;  // the time when bids started being placed
-	private final Node node;
-	private final TransactionReference classpath;
-	private final StorageReference auction;
-	private final List<BidToReveal> bids = new ArrayList<>();
-	private final GasHelper gasHelper;
-	private final NonceHelper nonceHelper;
+  private final Path auctionPath = Paths.get("../auction_events/target/auction_events-0.0.1.jar");
+  private final TransactionReference takamakaCode;
+  private final StorageReference[] accounts;
+  private final List<Signer<SignedTransactionRequest<?>>> signers;
+  private final String chainId;
+  private final long start;  // the time when bids started being placed
+  private final Node node;
+  private final TransactionReference classpath;
+  private final StorageReference auction;
+  private final List<BidToReveal> bids = new ArrayList<>();
+  private final GasHelper gasHelper;
+  private final NonceHelper nonceHelper;
 
-	public static void main(String[] args) throws Exception {
-		var config = RemoteNodeConfigBuilders.defaults()
-			.setURL("panarea.hotmoka.io")
-			.build();
+  public static void main(String[] args) throws Exception {
+    var config = RemoteNodeConfigBuilders.defaults()
+      .setURL("panarea.hotmoka.io")
+      .build();
 
-		try (var node = RemoteNodes.of(config)) {
-			new Events(node);
-		}
-	}
+    try (var node = RemoteNodes.of(config)) {
+      new Events(node);
+    }
+  }
 
-	/**
-	 * Class used to keep in memory the bids placed by each player,
-	 * that will be revealed at the end.
-	 */
-	private class BidToReveal {
-		private final int player;
-		private final BigInteger value;
-		private final boolean fake;
-		private final byte[] salt;
+  /**
+   * Class used to keep in memory the bids placed by each player,
+   * that will be revealed at the end.
+   */
+  private class BidToReveal {
+    private final int player;
+    private final BigInteger value;
+    private final boolean fake;
+    private final byte[] salt;
 
-		private BidToReveal(int player, BigInteger value, boolean fake, byte[] salt) {
-			this.player = player;
-			this.value = value;
-			this.fake = fake;
-			this.salt = salt;
-		}
+    private BidToReveal(int player, BigInteger value, boolean fake, byte[] salt) {
+      this.player = player;
+      this.value = value;
+      this.fake = fake;
+      this.salt = salt;
+    }
 
-		/**
-		 * Creates in store a revealed bid corresponding to this object.
-		 * 
-		 * @return the storage reference to the freshly created revealed bid
-		 */
-		private StorageReference intoBlockchain() throws Exception {
-			StorageReference bytes32 = node.addConstructorCallTransaction(TransactionRequests.constructorCall
-				(signers.get(player), accounts[player],
-				nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
-				panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
-				byteOf(salt[0]), byteOf(salt[1]), byteOf(salt[2]), byteOf(salt[3]),
-				byteOf(salt[4]), byteOf(salt[5]), byteOf(salt[6]), byteOf(salt[7]),
-				byteOf(salt[8]), byteOf(salt[9]), byteOf(salt[10]), byteOf(salt[11]),
-				byteOf(salt[12]), byteOf(salt[13]), byteOf(salt[14]), byteOf(salt[15]),
-				byteOf(salt[16]), byteOf(salt[17]), byteOf(salt[18]), byteOf(salt[19]),
-				byteOf(salt[20]), byteOf(salt[21]), byteOf(salt[22]), byteOf(salt[23]),
-				byteOf(salt[24]), byteOf(salt[25]), byteOf(salt[26]), byteOf(salt[27]),
-				byteOf(salt[28]), byteOf(salt[29]), byteOf(salt[30]), byteOf(salt[31])));
+    /**
+     * Creates in store a revealed bid corresponding to this object.
+     * 
+     * @return the storage reference to the freshly created revealed bid
+     */
+    private StorageReference intoBlockchain() throws Exception {
+      StorageReference bytes32 = node.addConstructorCallTransaction(TransactionRequests.constructorCall
+        (signers.get(player), accounts[player],
+        nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
+        panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
+        byteOf(salt[0]), byteOf(salt[1]), byteOf(salt[2]), byteOf(salt[3]),
+        byteOf(salt[4]), byteOf(salt[5]), byteOf(salt[6]), byteOf(salt[7]),
+        byteOf(salt[8]), byteOf(salt[9]), byteOf(salt[10]), byteOf(salt[11]),
+        byteOf(salt[12]), byteOf(salt[13]), byteOf(salt[14]), byteOf(salt[15]),
+        byteOf(salt[16]), byteOf(salt[17]), byteOf(salt[18]), byteOf(salt[19]),
+        byteOf(salt[20]), byteOf(salt[21]), byteOf(salt[22]), byteOf(salt[23]),
+        byteOf(salt[24]), byteOf(salt[25]), byteOf(salt[26]), byteOf(salt[27]),
+        byteOf(salt[28]), byteOf(salt[29]), byteOf(salt[30]), byteOf(salt[31])));
 
-			return node.addConstructorCallTransaction(TransactionRequests.constructorCall
-				(signers.get(player), accounts[player],
-				nonceHelper.getNonceOf(accounts[player]), chainId,
-				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_REVEALED_BID,
-				StorageValues.bigIntegerOf(value), StorageValues.booleanOf(fake), bytes32));
-		}
-	}
+      return node.addConstructorCallTransaction(TransactionRequests.constructorCall
+        (signers.get(player), accounts[player],
+        nonceHelper.getNonceOf(accounts[player]), chainId,
+        _500_000, panarea(gasHelper.getSafeGasPrice()), classpath, CONSTRUCTOR_REVEALED_BID,
+        StorageValues.bigIntegerOf(value), StorageValues.booleanOf(fake), bytes32));
+    }
+  }
 
-	private Events(Node node) throws Exception {
-		this.node = node;
-		takamakaCode = node.getTakamakaCode();
-		accounts = Stream.of(ADDRESSES).map(StorageValues::reference).toArray(StorageReference[]::new);
-		var signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
-		Function<SignedTransactionRequest<?>, byte[]> hasher = SignedTransactionRequest<?>::toByteArrayWithoutSignature;
-		signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate)
-			.map(key -> signature.getSigner(key, hasher))
-			.collect(Collectors.toCollection(ArrayList::new));
-		gasHelper = GasHelpers.of(node);
-		nonceHelper = NonceHelpers.of(node);
-		chainId = getChainId();
-		classpath = installJar();
-		auction = createContract();
-		start = System.currentTimeMillis();
+  private Events(Node node) throws Exception {
+    this.node = node;
+    takamakaCode = node.getTakamakaCode();
+    accounts = Stream.of(ADDRESSES).map(StorageValues::reference).toArray(StorageReference[]::new);
+    var signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
+    Function<SignedTransactionRequest<?>, byte[]> hasher = SignedTransactionRequest<?>::toByteArrayWithoutSignature;
+    signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate)
+      .map(key -> signature.getSigner(key, hasher))
+      .collect(Collectors.toCollection(ArrayList::new));
+    gasHelper = GasHelpers.of(node);
+    nonceHelper = NonceHelpers.of(node);
+    chainId = getChainId();
+    classpath = installJar();
+    auction = createContract();
+    start = System.currentTimeMillis();
 
-		try (var subscription = node.subscribeToEvents(auction,
-				(creator, event) -> System.out.println
-				("Seen event of class " + node.getClassTag(event).getClazz().getName()
-						+ " created by contract " + creator))) {
+    try (var subscription = node.subscribeToEvents(auction,
+        (creator, event) -> System.out.println
+        ("Seen event of class " + node.getClassTag(event).getClazz().getName()
+            + " created by contract " + creator))) {
 
-			StorageReference expectedWinner = placeBids();
-			waitUntilEndOfBiddingTime();
-			revealBids();
-			waitUntilEndOfRevealTime();
-			StorageValue winner = askForWinner();
+      StorageReference expectedWinner = placeBids();
+      waitUntilEndOfBiddingTime();
+      revealBids();
+      waitUntilEndOfRevealTime();
+      StorageValue winner = askForWinner();
 
-			// show that the contract computes the correct winner
-			System.out.println("expected winner: " + expectedWinner);
-			System.out.println("actual winner: " + winner);
-		}
-	}
+      // show that the contract computes the correct winner
+      System.out.println("expected winner: " + expectedWinner);
+      System.out.println("actual winner: " + winner);
+    }
+  }
 
-	private StorageReference createContract() throws Exception {
-		System.out.println("Creating contract");
+  private StorageReference createContract() throws Exception {
+    System.out.println("Creating contract");
 
-		return node.addConstructorCallTransaction
-			(TransactionRequests.constructorCall(signers.get(0), accounts[0],
-			nonceHelper.getNonceOf(accounts[0]), chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
-			classpath, CONSTRUCTOR_BLIND_AUCTION,
-			StorageValues.intOf(BIDDING_TIME), StorageValues.intOf(REVEAL_TIME)));
-	}
+    return node.addConstructorCallTransaction
+      (TransactionRequests.constructorCall(signers.get(0), accounts[0],
+      nonceHelper.getNonceOf(accounts[0]), chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
+      classpath, CONSTRUCTOR_BLIND_AUCTION,
+      StorageValues.intOf(BIDDING_TIME), StorageValues.intOf(REVEAL_TIME)));
+  }
 
-	private String getChainId() throws Exception {
-		return ((StringValue) node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
-			(accounts[0], // payer
-			BigInteger.valueOf(50_000), // gas limit
-			takamakaCode, // class path for the execution of the transaction
-			MethodSignatures.GET_CHAIN_ID, // method
-			node.getManifest()))) // receiver of the method call
-			.getValue();
-	}
+  private String getChainId() throws Exception {
+    return ((StringValue) node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
+      (accounts[0], // payer
+      BigInteger.valueOf(50_000), // gas limit
+      takamakaCode, // class path for the execution of the transaction
+      MethodSignatures.GET_CHAIN_ID, // method
+      node.getManifest()))) // receiver of the method call
+      .getValue();
+  }
 
-	private TransactionReference installJar() throws Exception {
-		System.out.println("Installing jar");
+  private TransactionReference installJar() throws Exception {
+    System.out.println("Installing jar");
 
-		return node.addJarStoreTransaction(TransactionRequests.jarStore
-			(signers.get(0), // an object that signs with the payer's private key
-			accounts[0], // payer
-			nonceHelper.getNonceOf(accounts[0]), // payer's nonce
-			chainId, // chain identifier
-			BigInteger.valueOf(1_000_000), // gas limit: enough for this very small jar
-			gasHelper.getSafeGasPrice(), // gas price: at least the current gas price of the network
-			takamakaCode, // class path for the execution of the transaction
-			Files.readAllBytes(auctionPath), // bytes of the jar to install
-			takamakaCode)); // dependency
-	}
+    return node.addJarStoreTransaction(TransactionRequests.jarStore
+      (signers.get(0), // an object that signs with the payer's private key
+      accounts[0], // payer
+      nonceHelper.getNonceOf(accounts[0]), // payer's nonce
+      chainId, // chain identifier
+      BigInteger.valueOf(1_000_000), // gas limit: enough for this very small jar
+      gasHelper.getSafeGasPrice(), // gas price: at least the current gas price of the network
+      takamakaCode, // class path for the execution of the transaction
+      Files.readAllBytes(auctionPath), // bytes of the jar to install
+      takamakaCode)); // dependency
+  }
 
-	private StorageReference placeBids() throws Exception {
-		var maxBid = BigInteger.ZERO;
-		StorageReference expectedWinner = null;
-		var random = new Random();
+  private StorageReference placeBids() throws Exception {
+    var maxBid = BigInteger.ZERO;
+    StorageReference expectedWinner = null;
+    var random = new Random();
 
-		int i = 1;
-		while (i <= NUM_BIDS) { // generate NUM_BIDS random bids
-			System.out.println("Placing bid " + i);
-			int player = 1 + random.nextInt(accounts.length - 1);
-			var deposit = BigInteger.valueOf(random.nextInt(1000));
-			var value = BigInteger.valueOf(random.nextInt(1000));
-			var fake = random.nextBoolean();
-			var salt = new byte[32];
-			random.nextBytes(salt); // random 32 bytes of salt for each bid
+    int i = 1;
+    while (i <= NUM_BIDS) { // generate NUM_BIDS random bids
+      System.out.println("Placing bid " + i);
+      int player = 1 + random.nextInt(accounts.length - 1);
+      var deposit = BigInteger.valueOf(random.nextInt(1000));
+      var value = BigInteger.valueOf(random.nextInt(1000));
+      var fake = random.nextBoolean();
+      var salt = new byte[32];
+      random.nextBytes(salt); // random 32 bytes of salt for each bid
 
-			// create a Bytes32 hash of the bid in the store of the node
-			StorageReference bytes32 = codeAsBytes32(player, value, fake, salt);
+      // create a Bytes32 hash of the bid in the store of the node
+      StorageReference bytes32 = codeAsBytes32(player, value, fake, salt);
 
-			// keep note of the best bid, to verify the result at the end
-			if (!fake && deposit.compareTo(value) >= 0)
-				if (expectedWinner == null || value.compareTo(maxBid) > 0) {
-					maxBid = value;
-					expectedWinner = accounts[player];
-				}
-				else if (value.equals(maxBid))
-					// we do not allow ex aequos, since the winner
-					// would depend on the fastest player to reveal
-					continue;
+      // keep note of the best bid, to verify the result at the end
+      if (!fake && deposit.compareTo(value) >= 0)
+        if (expectedWinner == null || value.compareTo(maxBid) > 0) {
+          maxBid = value;
+          expectedWinner = accounts[player];
+        }
+        else if (value.equals(maxBid))
+          // we do not allow ex aequos, since the winner
+          // would depend on the fastest player to reveal
+          continue;
 
-			// keep the explicit bid in memory, not yet in the node,
-			// since it would be visible there
-			bids.add(new BidToReveal(player, value, fake, salt));
+      // keep the explicit bid in memory, not yet in the node,
+      // since it would be visible there
+      bids.add(new BidToReveal(player, value, fake, salt));
 
-			// place a hashed bid in the node
-			node.addInstanceMethodCallTransaction(TransactionRequests.instanceMethodCall
-				(signers.get(player), accounts[player],
-				nonceHelper.getNonceOf(accounts[player]), chainId,
-				_500_000, panarea(gasHelper.getSafeGasPrice()), classpath, BID,
-				auction, StorageValues.bigIntegerOf(deposit), bytes32));
+      // place a hashed bid in the node
+      node.addInstanceMethodCallTransaction(TransactionRequests.instanceMethodCall
+        (signers.get(player), accounts[player],
+        nonceHelper.getNonceOf(accounts[player]), chainId,
+        _500_000, panarea(gasHelper.getSafeGasPrice()), classpath, BID,
+        auction, StorageValues.bigIntegerOf(deposit), bytes32));
 
-			i++;
-		}
+      i++;
+    }
 
-		return expectedWinner;
-	}
+    return expectedWinner;
+  }
 
-	private void revealBids() throws Exception {
-		// we create the revealed bids in blockchain; this is safe now, since the bidding time is over
-		int counter = 1;
-		for (BidToReveal bid: bids) {
-			System.out.println("Revealing bid " + counter++ + " out of " + bids.size());
-			int player = bid.player;
-			StorageReference bidInBlockchain = bid.intoBlockchain();
-			node.addInstanceMethodCallTransaction(TransactionRequests.instanceMethodCall
-				(signers.get(player), accounts[player],
-				nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
-				panarea(gasHelper.getSafeGasPrice()),
-				classpath, REVEAL, auction, bidInBlockchain));
-		}
-	}
+  private void revealBids() throws Exception {
+    // we create the revealed bids in blockchain; this is safe now, since the bidding time is over
+    int counter = 1;
+    for (BidToReveal bid: bids) {
+      System.out.println("Revealing bid " + counter++ + " out of " + bids.size());
+      int player = bid.player;
+      StorageReference bidInBlockchain = bid.intoBlockchain();
+      node.addInstanceMethodCallTransaction(TransactionRequests.instanceMethodCall
+        (signers.get(player), accounts[player],
+        nonceHelper.getNonceOf(accounts[player]), chainId, _500_000,
+        panarea(gasHelper.getSafeGasPrice()),
+        classpath, REVEAL, auction, bidInBlockchain));
+    }
+  }
 
-	private StorageReference askForWinner() throws Exception {
-		StorageValue winner = node.addInstanceMethodCallTransaction
-			(TransactionRequests.instanceMethodCall
-			(signers.get(0), accounts[0], nonceHelper.getNonceOf(accounts[0]),
-			chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
-			classpath, AUCTION_END, auction));
+  private StorageReference askForWinner() throws Exception {
+    StorageValue winner = node.addInstanceMethodCallTransaction
+      (TransactionRequests.instanceMethodCall
+      (signers.get(0), accounts[0], nonceHelper.getNonceOf(accounts[0]),
+      chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
+      classpath, AUCTION_END, auction));
 
-		// the winner is normally a StorageReference,
-		// but it could be a NullValue if all bids were fake
-		return winner instanceof StorageReference ? (StorageReference) winner : null;
-	}
+    // the winner is normally a StorageReference,
+    // but it could be a NullValue if all bids were fake
+    return winner instanceof StorageReference ? (StorageReference) winner : null;
+  }
 
-	private void waitUntilEndOfBiddingTime() {
-		waitUntil(BIDDING_TIME + 5000);
-	}
+  private void waitUntilEndOfBiddingTime() {
+    waitUntil(BIDDING_TIME + 5000);
+  }
 
-	private void waitUntilEndOfRevealTime() {
-		waitUntil(BIDDING_TIME + REVEAL_TIME + 5000);
-	}
+  private void waitUntilEndOfRevealTime() {
+    waitUntil(BIDDING_TIME + REVEAL_TIME + 5000);
+  }
 
-	/**
-	 * Waits until a specific time after start.
-	 */
-	private void waitUntil(long duration) {
-		try {
-			Thread.sleep(start + duration - System.currentTimeMillis());
-		}
-		catch (InterruptedException e) {}
-	}
+  /**
+   * Waits until a specific time after start.
+   */
+  private void waitUntil(long duration) {
+    try {
+      Thread.sleep(start + duration - System.currentTimeMillis());
+    }
+    catch (InterruptedException e) {}
+  }
 
-	/**
-	 * Hashes a bid and put it in the store of the node, in hashed form.
-	 */
-	private StorageReference codeAsBytes32(int player, BigInteger value, boolean fake, byte[] salt) throws Exception {
-		digest.reset();
-		digest.update(value.toByteArray());
-		digest.update(fake ? (byte) 0 : (byte) 1);
-		digest.update(salt);
-		byte[] hash = digest.digest();
-		return createBytes32(player, hash);
-	}
+  /**
+   * Hashes a bid and put it in the store of the node, in hashed form.
+   */
+  private StorageReference codeAsBytes32(int player, BigInteger value, boolean fake, byte[] salt) throws Exception {
+    digest.reset();
+    digest.update(value.toByteArray());
+    digest.update(fake ? (byte) 0 : (byte) 1);
+    digest.update(salt);
+    byte[] hash = digest.digest();
+    return createBytes32(player, hash);
+  }
 
-	/**
-	 * Creates a Bytes32Snapshot object in the store of the node.
-	 */
-	private StorageReference createBytes32(int player, byte[] hash) throws Exception {
-		return node.addConstructorCallTransaction
-			(TransactionRequests.constructorCall(
-			signers.get(player),
-			accounts[player],
-			nonceHelper.getNonceOf(accounts[player]), chainId,
-			_500_000, panarea(gasHelper.getSafeGasPrice()),
-			classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
-			byteOf(hash[0]), byteOf(hash[1]),
-			byteOf(hash[2]), byteOf(hash[3]),
-			byteOf(hash[4]), byteOf(hash[5]),
-			byteOf(hash[6]), byteOf(hash[7]),
-			byteOf(hash[8]), byteOf(hash[9]),
-			byteOf(hash[10]), byteOf(hash[11]),
-			byteOf(hash[12]), byteOf(hash[13]),
-			byteOf(hash[14]), byteOf(hash[15]),
-			byteOf(hash[16]), byteOf(hash[17]),
-			byteOf(hash[18]), byteOf(hash[19]),
-			byteOf(hash[20]), byteOf(hash[21]),
-			byteOf(hash[22]), byteOf(hash[23]),
-			byteOf(hash[24]), byteOf(hash[25]),
-			byteOf(hash[26]), byteOf(hash[27]),
-			byteOf(hash[28]), byteOf(hash[29]),
-			byteOf(hash[30]), byteOf(hash[31])));
-	}
+  /**
+   * Creates a Bytes32Snapshot object in the store of the node.
+   */
+  private StorageReference createBytes32(int player, byte[] hash) throws Exception {
+    return node.addConstructorCallTransaction
+      (TransactionRequests.constructorCall(
+      signers.get(player),
+      accounts[player],
+      nonceHelper.getNonceOf(accounts[player]), chainId,
+      _500_000, panarea(gasHelper.getSafeGasPrice()),
+      classpath, CONSTRUCTOR_BYTES32_SNAPSHOT,
+      byteOf(hash[0]), byteOf(hash[1]),
+      byteOf(hash[2]), byteOf(hash[3]),
+      byteOf(hash[4]), byteOf(hash[5]),
+      byteOf(hash[6]), byteOf(hash[7]),
+      byteOf(hash[8]), byteOf(hash[9]),
+      byteOf(hash[10]), byteOf(hash[11]),
+      byteOf(hash[12]), byteOf(hash[13]),
+      byteOf(hash[14]), byteOf(hash[15]),
+      byteOf(hash[16]), byteOf(hash[17]),
+      byteOf(hash[18]), byteOf(hash[19]),
+      byteOf(hash[20]), byteOf(hash[21]),
+      byteOf(hash[22]), byteOf(hash[23]),
+      byteOf(hash[24]), byteOf(hash[25]),
+      byteOf(hash[26]), byteOf(hash[27]),
+      byteOf(hash[28]), byteOf(hash[29]),
+      byteOf(hash[30]), byteOf(hash[31])));
+  }
 
-	private KeyPair loadKeys(StorageReference account) {
-		try {
-			String password;
-			if (account.toString().equals(ADDRESSES[0]))
-				password = "chocolate";
-			else if (account.toString().equals(ADDRESSES[1]))
-				password = "orange";
-			else
-				password = "apple";
+  private KeyPair loadKeys(StorageReference account) {
+    try {
+      String password;
+      if (account.toString().equals(ADDRESSES[0]))
+        password = "chocolate";
+      else if (account.toString().equals(ADDRESSES[1]))
+        password = "orange";
+      else
+        password = "apple";
 
-			return Accounts.of(account, "..").keys(password, SignatureHelpers.of(node).signatureAlgorithmFor(account));
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+      return Accounts.of(account, "..").keys(password, SignatureHelpers.of(node).signatureAlgorithmFor(account));
+    }
+    catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
