@@ -21,9 +21,9 @@ package runs;
 import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.security.KeyPair;
-import java.util.Base64;
 
 import io.hotmoka.constants.Constants;
+import io.hotmoka.crypto.Base64;
 import io.hotmoka.crypto.Entropies;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.helpers.InitializedNodes;
@@ -55,7 +55,7 @@ public class Publisher {
     var signature = SignatureAlgorithms.ed25519();
     var entropy = Entropies.random();
 	KeyPair keys = entropy.keys("password", signature);
-	var publicKeyBase64 = Base64.getEncoder().encodeToString(signature.encodingOf(keys.getPublic()));
+	var publicKeyBase64 = Base64.toBase64String(signature.encodingOf(keys.getPublic()));
 	var consensus = SimpleValidatorsConsensusConfigBuilders.defaults()
 		.setPublicKeyOfGamete(publicKeyBase64)
 		.setInitialSupply(SUPPLY)
