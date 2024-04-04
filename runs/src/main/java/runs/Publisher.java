@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
-import io.hotmoka.constants.Constants;
 import io.hotmoka.crypto.Base64;
 import io.hotmoka.crypto.Entropies;
 import io.hotmoka.crypto.SignatureAlgorithms;
@@ -32,6 +31,7 @@ import io.hotmoka.node.service.NodeServiceConfigBuilders;
 import io.hotmoka.node.service.NodeServices;
 import io.hotmoka.node.tendermint.TendermintNodeConfigBuilders;
 import io.hotmoka.node.tendermint.TendermintNodes;
+import io.takamaka.code.constants.Constants;
 
 /**
  * Run in the IDE or go inside this project and run

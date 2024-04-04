@@ -62,6 +62,7 @@ import io.hotmoka.helpers.api.GasHelper;
 import io.hotmoka.helpers.api.NonceHelper;
 import io.hotmoka.node.Accounts;
 import io.hotmoka.node.api.Node;
+import io.hotmoka.node.api.NodeException;
 import io.hotmoka.node.remote.RemoteNodeConfigBuilders;
 import io.hotmoka.node.remote.RemoteNodes;
 
@@ -195,11 +196,7 @@ public class Events {
     auction = createContract();
     start = System.currentTimeMillis();
 
-    try (var subscription = node.subscribeToEvents(auction,
-        (creator, event) -> System.out.println
-        ("Seen event of class " + node.getClassTag(event).getClazz().getName()
-            + " created by contract " + creator))) {
-
+    try (var subscription = node.subscribeToEvents(auction, this::eventHandler)) {
       StorageReference expectedWinner = placeBids();
       waitUntilEndOfBiddingTime();
       revealBids();
@@ -209,6 +206,17 @@ public class Events {
       // show that the contract computes the correct winner
       System.out.println("expected winner: " + expectedWinner);
       System.out.println("actual winner: " + winner);
+    }
+  }
+
+  private void eventHandler(StorageReference creator, StorageReference event) {
+    try {
+        System.out.println
+         ("Seen event of class " + node.getClassTag(event).getClazz().getName()
+           + " created by contract " + creator);
+    }
+    catch (NodeException e) {
+      System.out.println("The node is misbehaving: " + e.getMessage());
     }
   }
 

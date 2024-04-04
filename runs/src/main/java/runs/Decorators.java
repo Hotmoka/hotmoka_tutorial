@@ -23,7 +23,6 @@ import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.util.Base64;
 
-import io.hotmoka.constants.Constants;
 import io.hotmoka.crypto.Entropies;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.helpers.AccountsNodes;
@@ -32,6 +31,7 @@ import io.hotmoka.helpers.JarsNodes;
 import io.hotmoka.node.SimpleConsensusConfigBuilders;
 import io.hotmoka.node.disk.DiskNodeConfigBuilders;
 import io.hotmoka.node.disk.DiskNodes;
+import io.takamaka.code.constants.Constants;
 
 /**
  * Run in the IDE or go inside this project and run

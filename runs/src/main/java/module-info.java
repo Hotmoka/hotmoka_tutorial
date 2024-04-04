@@ -6,5 +6,5 @@ module runs {
   requires io.hotmoka.node.disk;
   requires io.hotmoka.node.tendermint;
   requires io.hotmoka.node.service;
-  requires io.hotmoka.constants;
+  requires io.takamaka.code.constants;
 }
