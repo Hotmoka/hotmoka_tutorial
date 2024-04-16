@@ -23,6 +23,7 @@ import static io.hotmoka.helpers.Coin.panarea;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
@@ -46,7 +47,6 @@ import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.node.Accounts;
 import io.hotmoka.node.api.Node;
-import io.hotmoka.node.remote.RemoteNodeConfigBuilders;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
@@ -68,16 +68,12 @@ public class Family3 {
     // the path of the user jar to install
     var familyPath = Paths.get("../family_exported/target/family_exported-0.0.1.jar");
 
-    var config = RemoteNodeConfigBuilders.defaults()
-    	.setURL("panarea.hotmoka.io")
-    	.build();
-
-    try (var node = RemoteNodes.of(config)) {
-    	// we get a reference to where io-takamaka-code-1.0.1.jar has been stored
+    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 5000)) {
+    	// we get a reference to where io-takamaka-code-X.Y.Z.jar has been stored
         TransactionReference takamakaCode = node.getTakamakaCode();
 
         // we get the signing algorithm to use for requests
-        SignatureAlgorithm signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
+        SignatureAlgorithm signature = SignatureAlgorithms.of(node.getConsensusConfig());
 
         var account = StorageValues.reference(ADDRESS);
         KeyPair keys = loadKeys(node, account);

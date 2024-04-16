@@ -28,6 +28,7 @@ import static io.hotmoka.beans.StorageValues.byteOf;
 import static io.hotmoka.helpers.Coin.panarea;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -61,9 +62,7 @@ import io.hotmoka.helpers.api.GasHelper;
 import io.hotmoka.helpers.api.NonceHelper;
 import io.hotmoka.node.Accounts;
 import io.hotmoka.node.api.Node;
-import io.hotmoka.node.remote.RemoteNodeConfigBuilders;
 import io.hotmoka.node.remote.RemoteNodes;
-import io.hotmoka.node.remote.api.RemoteNodeConfig;
 
 /**
  * Run in the IDE or go inside this project and run
@@ -126,11 +125,7 @@ public class Auction {
   private final NonceHelper nonceHelper;
 
   public static void main(String[] args) throws Exception {
-    RemoteNodeConfig config = RemoteNodeConfigBuilders.defaults()
-      .setURL("panarea.hotmoka.io")
-      .build();
-
-    try (Node node = RemoteNodes.of(config)) {
+    try (Node node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 5000)) {
       new Auction(node);
     }
   }
@@ -183,7 +178,7 @@ public class Auction {
     this.node = node;
     takamakaCode = node.getTakamakaCode();
     accounts = Stream.of(ADDRESSES).map(StorageValues::reference).toArray(StorageReference[]::new);
-    var signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
+    var signature = SignatureAlgorithms.of(node.getConsensusConfig());
     signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate).map(key -> signature.getSigner(key, SignedTransactionRequest<?>::toByteArrayWithoutSignature))
       .collect(Collectors.toCollection(ArrayList::new));
     gasHelper = GasHelpers.of(node);
@@ -240,9 +235,9 @@ public class Auction {
   }
 
   private StorageReference placeBids() throws Exception {
-    BigInteger maxBid = BigInteger.ZERO;
+    var maxBid = BigInteger.ZERO;
     StorageReference expectedWinner = null;
-    Random random = new Random();
+    var random = new Random();
 
     int i = 1;
     while (i <= NUM_BIDS) { // generate NUM_BIDS random bids

@@ -27,7 +27,6 @@ import io.hotmoka.crypto.Entropies;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.helpers.InitializedNodes;
 import io.hotmoka.node.SimpleValidatorsConsensusConfigBuilders;
-import io.hotmoka.node.service.NodeServiceConfigBuilders;
 import io.hotmoka.node.service.NodeServices;
 import io.hotmoka.node.tendermint.TendermintNodeConfigBuilders;
 import io.hotmoka.node.tendermint.TendermintNodes;
@@ -44,7 +43,6 @@ public class Publisher {
 
   public static void main(String[] args) throws Exception {
     var config = TendermintNodeConfigBuilders.defaults().build();
-    var serviceConfig = NodeServiceConfigBuilders.defaults().build();
     // the path of the runtime Takamaka jar, inside Maven's cache
     var takamakaCodePath = Paths.get
       (System.getProperty("user.home") +
@@ -64,7 +62,7 @@ public class Publisher {
 	try (var original = TendermintNodes.init(config, consensus);
          // remove the next line if you want to publish an uninitialized node
          var initialized = InitializedNodes.of(original, consensus, takamakaCodePath);
-         var service = NodeServices.of(serviceConfig, original)) {
+         var service = NodeServices.of(original, 8001)) {
 
         System.out.println("\nPress ENTER to turn off the server and exit this program");
         System.in.read();

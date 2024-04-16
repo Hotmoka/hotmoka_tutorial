@@ -28,6 +28,7 @@ import static io.hotmoka.beans.StorageValues.byteOf;
 import static io.hotmoka.helpers.Coin.panarea;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +36,9 @@ import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,7 +66,6 @@ import io.hotmoka.helpers.api.NonceHelper;
 import io.hotmoka.node.Accounts;
 import io.hotmoka.node.api.Node;
 import io.hotmoka.node.api.NodeException;
-import io.hotmoka.node.remote.RemoteNodeConfigBuilders;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
@@ -127,11 +129,7 @@ public class Events {
   private final NonceHelper nonceHelper;
 
   public static void main(String[] args) throws Exception {
-    var config = RemoteNodeConfigBuilders.defaults()
-      .setURL("panarea.hotmoka.io")
-      .build();
-
-    try (var node = RemoteNodes.of(config)) {
+    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 5000)) {
       new Events(node);
     }
   }
@@ -184,7 +182,7 @@ public class Events {
     this.node = node;
     takamakaCode = node.getTakamakaCode();
     accounts = Stream.of(ADDRESSES).map(StorageValues::reference).toArray(StorageReference[]::new);
-    var signature = SignatureAlgorithms.of(node.getNameOfSignatureAlgorithmForRequests());
+    var signature = SignatureAlgorithms.of(node.getConsensusConfig());
     Function<SignedTransactionRequest<?>, byte[]> hasher = SignedTransactionRequest<?>::toByteArrayWithoutSignature;
     signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate)
       .map(key -> signature.getSigner(key, hasher))
@@ -215,8 +213,11 @@ public class Events {
          ("Seen event of class " + node.getClassTag(event).getClazz()
            + " created by contract " + creator);
     }
-    catch (NodeException e) {
+    catch (NodeException | NoSuchElementException | TimeoutException e) {
       System.out.println("The node is misbehaving: " + e.getMessage());
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
   }
 
