@@ -26,45 +26,45 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
-import io.hotmoka.beans.MethodSignatures;
-import io.hotmoka.beans.StorageValues;
-import io.hotmoka.beans.TransactionRequests;
-import io.hotmoka.beans.api.requests.SignedTransactionRequest;
-import io.hotmoka.beans.api.transactions.TransactionReference;
-import io.hotmoka.beans.api.values.BigIntegerValue;
-import io.hotmoka.beans.api.values.StorageReference;
-import io.hotmoka.beans.api.values.StringValue;
-import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.node.Accounts;
+import io.hotmoka.node.MethodSignatures;
+import io.hotmoka.node.StorageValues;
+import io.hotmoka.node.TransactionRequests;
 import io.hotmoka.node.api.Node;
+import io.hotmoka.node.api.requests.SignedTransactionRequest;
+import io.hotmoka.node.api.transactions.TransactionReference;
+import io.hotmoka.node.api.values.BigIntegerValue;
+import io.hotmoka.node.api.values.StorageReference;
+import io.hotmoka.node.api.values.StringValue;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
  * Run in the IDE or go inside this project and run
  * 
  * mvn clean package
- * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Family
+ * java --module-path ../../hotmoka/io-hotmoka-moka/modules/explicit/:../../hotmoka/io-hotmoka-moka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/io-hotmoka-moka/modules/unnamed"/*" --add-modules org.glassfish.tyrus.container.grizzly.server,org.glassfish.tyrus.container.grizzly.client --module runs/runs.Family
  */
 public class Family {
 
   // change this with your account's storage reference
   private final static String
-    ADDRESS = "312020479f61650b2184ebb4bdd22aa57b35ff68f4559d23fa4eac4dd158f247#0";
+    ADDRESS = "883efcf0348d1c37e38d7cdc6aece63d56df410bc5db606f3329903159b6d9d3#0";
 
   public static void main(String[] args) throws Exception {
 
 	// the path of the user jar to install
     var familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
-    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 5000)) {
+    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 20000)) {
     	// we get a reference to where io-takamaka-code-X.Y.Z.jar has been stored
         TransactionReference takamakaCode = node.getTakamakaCode();
+        StorageReference manifest = node.getManifest();
 
         // we get the signing algorithm to use for requests
-        var signature = SignatureAlgorithms.of(node.getConsensusConfig());
+        var signature = node.getConfig().getSignatureForRequests();
 
         var account = StorageValues.reference(ADDRESS);
         KeyPair keys = loadKeys(node, account);
@@ -92,7 +92,7 @@ public class Family {
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.GET_CHAIN_ID, // method
-            node.getManifest()))) // receiver of the method call
+            manifest))) // receiver of the method call
           .getValue();
 
         var gasHelper = GasHelpers.of(node);

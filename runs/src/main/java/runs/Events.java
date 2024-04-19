@@ -18,14 +18,14 @@
 
 package runs;
 
-import static io.hotmoka.beans.StorageTypes.BIG_INTEGER;
-import static io.hotmoka.beans.StorageTypes.BOOLEAN;
-import static io.hotmoka.beans.StorageTypes.BYTE;
-import static io.hotmoka.beans.StorageTypes.BYTES32_SNAPSHOT;
-import static io.hotmoka.beans.StorageTypes.INT;
-import static io.hotmoka.beans.StorageTypes.PAYABLE_CONTRACT;
-import static io.hotmoka.beans.StorageValues.byteOf;
 import static io.hotmoka.helpers.Coin.panarea;
+import static io.hotmoka.node.StorageTypes.BIG_INTEGER;
+import static io.hotmoka.node.StorageTypes.BOOLEAN;
+import static io.hotmoka.node.StorageTypes.BYTE;
+import static io.hotmoka.node.StorageTypes.BYTES32_SNAPSHOT;
+import static io.hotmoka.node.StorageTypes.INT;
+import static io.hotmoka.node.StorageTypes.PAYABLE_CONTRACT;
+import static io.hotmoka.node.StorageValues.byteOf;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -36,27 +36,12 @@ import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.hotmoka.beans.ConstructorSignatures;
-import io.hotmoka.beans.MethodSignatures;
-import io.hotmoka.beans.StorageTypes;
-import io.hotmoka.beans.StorageValues;
-import io.hotmoka.beans.TransactionRequests;
-import io.hotmoka.beans.api.requests.SignedTransactionRequest;
-import io.hotmoka.beans.api.signatures.ConstructorSignature;
-import io.hotmoka.beans.api.signatures.MethodSignature;
-import io.hotmoka.beans.api.transactions.TransactionReference;
-import io.hotmoka.beans.api.types.ClassType;
-import io.hotmoka.beans.api.values.StorageReference;
-import io.hotmoka.beans.api.values.StorageValue;
-import io.hotmoka.beans.api.values.StringValue;
-import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.NonceHelpers;
@@ -64,15 +49,29 @@ import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.helpers.api.GasHelper;
 import io.hotmoka.helpers.api.NonceHelper;
 import io.hotmoka.node.Accounts;
+import io.hotmoka.node.ConstructorSignatures;
+import io.hotmoka.node.MethodSignatures;
+import io.hotmoka.node.StorageTypes;
+import io.hotmoka.node.StorageValues;
+import io.hotmoka.node.TransactionRequests;
 import io.hotmoka.node.api.Node;
 import io.hotmoka.node.api.NodeException;
+import io.hotmoka.node.api.UnknownReferenceException;
+import io.hotmoka.node.api.requests.SignedTransactionRequest;
+import io.hotmoka.node.api.signatures.ConstructorSignature;
+import io.hotmoka.node.api.signatures.MethodSignature;
+import io.hotmoka.node.api.transactions.TransactionReference;
+import io.hotmoka.node.api.types.ClassType;
+import io.hotmoka.node.api.values.StorageReference;
+import io.hotmoka.node.api.values.StorageValue;
+import io.hotmoka.node.api.values.StringValue;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
  * Run in the IDE or go inside this project and run
  * 
  * mvn clean package
- * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Events
+ * java --module-path ../../hotmoka/io-hotmoka-moka/modules/explicit/:../../hotmoka/io-hotmoka-moka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/io-hotmoka-moka/modules/unnamed"/*" --add-modules org.glassfish.tyrus.container.grizzly.server,org.glassfish.tyrus.container.grizzly.client --module runs/runs.Events
  */
 public class Events {
   // change this with your accounts' storage references
@@ -80,9 +79,9 @@ public class Events {
   private final static String[] ADDRESSES = new String[3];
   
   static {
-    ADDRESSES[0] = "da5ceafc37c8e5fbf01c299b2ccd1deebcad79d1f37e8cd37bd7af0b3df6faf2#0";
-    ADDRESSES[1] = "caa3a8d71ff2577c38947d7bb9565957dfc778b8904cade4deca718ced83ae49#0";
-    ADDRESSES[2] = "d85759af2a019fdd4b8f3c3a4bec40a8069df0c481679d4022386f8fffff09c8#0";
+    ADDRESSES[0] = "883efcf0348d1c37e38d7cdc6aece63d56df410bc5db606f3329903159b6d9d3#0";
+    ADDRESSES[1] = "52dfc4eb23c0fc8440d1acd12c660be9d02677d2a228e8c7a3b4086ca85f2193#0";
+    ADDRESSES[2] = "26a606339eb30a7876c23e5063928f53ae6317b1a0b83e09f4b692423ac44333#0";
   }
 
   public final static int NUM_BIDS = 10; // number of bids placed
@@ -129,7 +128,7 @@ public class Events {
   private final NonceHelper nonceHelper;
 
   public static void main(String[] args) throws Exception {
-    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 5000)) {
+    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 20000)) {
       new Events(node);
     }
   }
@@ -182,7 +181,7 @@ public class Events {
     this.node = node;
     takamakaCode = node.getTakamakaCode();
     accounts = Stream.of(ADDRESSES).map(StorageValues::reference).toArray(StorageReference[]::new);
-    var signature = SignatureAlgorithms.of(node.getConsensusConfig());
+    var signature = node.getConfig().getSignatureForRequests();
     Function<SignedTransactionRequest<?>, byte[]> hasher = SignedTransactionRequest<?>::toByteArrayWithoutSignature;
     signers = Stream.of(accounts).map(this::loadKeys).map(KeyPair::getPrivate)
       .map(key -> signature.getSigner(key, hasher))
@@ -213,7 +212,7 @@ public class Events {
          ("Seen event of class " + node.getClassTag(event).getClazz()
            + " created by contract " + creator);
     }
-    catch (NodeException | NoSuchElementException | TimeoutException e) {
+    catch (NodeException | UnknownReferenceException | TimeoutException e) {
       System.out.println("The node is misbehaving: " + e.getMessage());
     }
     catch (InterruptedException e) {
@@ -232,12 +231,13 @@ public class Events {
   }
 
   private String getChainId() throws Exception {
+    StorageReference manifest = node.getManifest();
     return ((StringValue) node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
       (accounts[0], // payer
       BigInteger.valueOf(50_000), // gas limit
       takamakaCode, // class path for the execution of the transaction
       MethodSignatures.GET_CHAIN_ID, // method
-      node.getManifest()))) // receiver of the method call
+      manifest))) // receiver of the method call
       .getValue();
   }
 

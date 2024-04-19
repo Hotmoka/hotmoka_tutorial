@@ -21,14 +21,13 @@ package runs;
 import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.security.KeyPair;
-import java.util.Base64;
 
 import io.hotmoka.crypto.Entropies;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.helpers.AccountsNodes;
 import io.hotmoka.helpers.InitializedNodes;
 import io.hotmoka.helpers.JarsNodes;
-import io.hotmoka.node.SimpleConsensusConfigBuilders;
+import io.hotmoka.node.ConsensusConfigBuilders;
 import io.hotmoka.node.disk.DiskNodeConfigBuilders;
 import io.hotmoka.node.disk.DiskNodes;
 import io.takamaka.code.constants.Constants;
@@ -37,7 +36,7 @@ import io.takamaka.code.constants.Constants;
  * Run in the IDE or go inside this project and run
  * 
  * mvn clean package
- * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Decorators
+ * java --module-path ../../hotmoka/io-hotmoka-moka/modules/explicit/:../../hotmoka/io-hotmoka-moka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/io-hotmoka-moka/modules/unnamed"/*" --add-modules org.glassfish.tyrus.container.grizzly.server,org.glassfish.tyrus.container.grizzly.client --module runs/runs.Decorators
  */
 public class Decorators {
   public final static BigInteger SUPPLY = BigInteger.valueOf(1_000_000_000);
@@ -57,10 +56,9 @@ public class Decorators {
     var signature = SignatureAlgorithms.ed25519();
 	var entropy = Entropies.random();
 	KeyPair keys = entropy.keys("password", signature);
-	var publicKeyBase64 = Base64.getEncoder().encodeToString(signature.encodingOf(keys.getPublic()));
-	var consensus = SimpleConsensusConfigBuilders.defaults()
+	var consensus = ConsensusConfigBuilders.defaults()
    		.setInitialSupply(SUPPLY)
-   		.setPublicKeyOfGamete(publicKeyBase64).build();
+   		.setPublicKeyOfGamete(keys.getPublic()).build();
 
 	try (var node = DiskNodes.init(config, consensus)) {
       // first view: store the io-takamaka-code jar and create manifest and gamete

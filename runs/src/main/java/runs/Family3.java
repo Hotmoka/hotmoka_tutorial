@@ -18,8 +18,8 @@
 
 package runs;
 
-import static io.hotmoka.beans.StorageTypes.INT;
 import static io.hotmoka.helpers.Coin.panarea;
+import static io.hotmoka.node.StorageTypes.INT;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
@@ -28,38 +28,37 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
-import io.hotmoka.beans.ConstructorSignatures;
-import io.hotmoka.beans.MethodSignatures;
-import io.hotmoka.beans.StorageTypes;
-import io.hotmoka.beans.StorageValues;
-import io.hotmoka.beans.TransactionRequests;
-import io.hotmoka.beans.api.requests.SignedTransactionRequest;
-import io.hotmoka.beans.api.transactions.TransactionReference;
-import io.hotmoka.beans.api.types.ClassType;
-import io.hotmoka.beans.api.values.BigIntegerValue;
-import io.hotmoka.beans.api.values.StorageReference;
-import io.hotmoka.beans.api.values.StorageValue;
-import io.hotmoka.beans.api.values.StringValue;
-import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.crypto.api.SignatureAlgorithm;
 import io.hotmoka.crypto.api.Signer;
 import io.hotmoka.helpers.GasHelpers;
 import io.hotmoka.helpers.SignatureHelpers;
 import io.hotmoka.node.Accounts;
+import io.hotmoka.node.ConstructorSignatures;
+import io.hotmoka.node.MethodSignatures;
+import io.hotmoka.node.StorageTypes;
+import io.hotmoka.node.StorageValues;
+import io.hotmoka.node.TransactionRequests;
 import io.hotmoka.node.api.Node;
+import io.hotmoka.node.api.requests.SignedTransactionRequest;
+import io.hotmoka.node.api.transactions.TransactionReference;
+import io.hotmoka.node.api.types.ClassType;
+import io.hotmoka.node.api.values.BigIntegerValue;
+import io.hotmoka.node.api.values.StorageReference;
+import io.hotmoka.node.api.values.StorageValue;
+import io.hotmoka.node.api.values.StringValue;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
  * Run in the IDE or go inside this project and run
  * 
  * mvn clean package
- * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Family3
+ * java --module-path ../../hotmoka/io-hotmoka-moka/modules/explicit/:../../hotmoka/io-hotmoka-moka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/io-hotmoka-moka/modules/unnamed"/*" --add-modules org.glassfish.tyrus.container.grizzly.server,org.glassfish.tyrus.container.grizzly.client --module runs/runs.Family3
  */
 public class Family3 {
 
   // change this with your account's storage reference
   private final static String
-    ADDRESS = "da5ceafc37c8e5fbf01c299b2ccd1deebcad79d1f37e8cd37bd7af0b3df6faf2#0";
+    ADDRESS = "883efcf0348d1c37e38d7cdc6aece63d56df410bc5db606f3329903159b6d9d3#0";
 
   private final static ClassType PERSON = StorageTypes.classNamed("io.takamaka.family.Person");
 
@@ -68,12 +67,13 @@ public class Family3 {
     // the path of the user jar to install
     var familyPath = Paths.get("../family_exported/target/family_exported-0.0.1.jar");
 
-    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 5000)) {
+    try (var node = RemoteNodes.of(URI.create("ws://panarea.hotmoka.io"), 20000)) {
     	// we get a reference to where io-takamaka-code-X.Y.Z.jar has been stored
         TransactionReference takamakaCode = node.getTakamakaCode();
+        StorageReference manifest = node.getManifest();
 
         // we get the signing algorithm to use for requests
-        SignatureAlgorithm signature = SignatureAlgorithms.of(node.getConsensusConfig());
+        SignatureAlgorithm signature = node.getConfig().getSignatureForRequests();
 
         var account = StorageValues.reference(ADDRESS);
         KeyPair keys = loadKeys(node, account);
@@ -101,7 +101,7 @@ public class Family3 {
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.GET_CHAIN_ID, // method
-            node.getManifest()))) // receiver of the method call
+            manifest))) // receiver of the method call
           .getValue();
 
         var gasHelper = GasHelpers.of(node);

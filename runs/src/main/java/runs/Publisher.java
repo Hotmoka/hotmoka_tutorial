@@ -22,11 +22,10 @@ import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 
-import io.hotmoka.crypto.Base64;
 import io.hotmoka.crypto.Entropies;
 import io.hotmoka.crypto.SignatureAlgorithms;
 import io.hotmoka.helpers.InitializedNodes;
-import io.hotmoka.node.SimpleValidatorsConsensusConfigBuilders;
+import io.hotmoka.node.ValidatorsConsensusConfigBuilders;
 import io.hotmoka.node.service.NodeServices;
 import io.hotmoka.node.tendermint.TendermintNodeConfigBuilders;
 import io.hotmoka.node.tendermint.TendermintNodes;
@@ -36,7 +35,7 @@ import io.takamaka.code.constants.Constants;
  * Run in the IDE or go inside this project and run
  * 
  * mvn clean package
- * java --module-path ../../hotmoka/modules/explicit/:../../hotmoka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/modules/unnamed"/*" --module runs/runs.Publisher
+ * java --module-path ../../hotmoka/io-hotmoka-moka/modules/explicit/:../../hotmoka/io-hotmoka-moka/modules/automatic:target/runs-0.0.1.jar -classpath ../../hotmoka/io-hotmoka-moka/modules/unnamed"/*" --add-modules org.glassfish.tyrus.container.grizzly.server,org.glassfish.tyrus.container.grizzly.client --module runs/runs.Publisher
  */
 public class Publisher {
   public final static BigInteger SUPPLY = BigInteger.valueOf(100_000_000);
@@ -53,9 +52,8 @@ public class Publisher {
     var signature = SignatureAlgorithms.ed25519();
     var entropy = Entropies.random();
 	KeyPair keys = entropy.keys("password", signature);
-	var publicKeyBase64 = Base64.toBase64String(signature.encodingOf(keys.getPublic()));
-	var consensus = SimpleValidatorsConsensusConfigBuilders.defaults()
-		.setPublicKeyOfGamete(publicKeyBase64)
+	var consensus = ValidatorsConsensusConfigBuilders.defaults()
+		.setPublicKeyOfGamete(keys.getPublic())
 		.setInitialSupply(SUPPLY)
 		.build();
 
