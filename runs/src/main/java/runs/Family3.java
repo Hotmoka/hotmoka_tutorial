@@ -91,7 +91,7 @@ public class Family3 {
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.NONCE, // method
-            account))) // receiver of the method call
+            account)).get()) // receiver of the method call
           .getValue();
 
         // we get the chain identifier of the network
@@ -101,7 +101,7 @@ public class Family3 {
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.GET_CHAIN_ID, // method
-            manifest))) // receiver of the method call
+            manifest)).get()) // receiver of the method call
           .getValue();
 
         var gasHelper = GasHelpers.of(node);
@@ -157,11 +157,11 @@ public class Family3 {
              family, // class path for the execution of the transaction
 
       	     // method to call: String Person.toString()
-             MethodSignatures.of(PERSON, "toString", StorageTypes.STRING),
+             MethodSignatures.ofNonVoid(PERSON, "toString", StorageTypes.STRING),
 
         	 // receiver of the method to call
              albert
-           ));
+           )).get();
 
         // we increase our copy of the nonce, ready for further
         // transactions having the account as payer

@@ -89,7 +89,7 @@ public class Family2 {
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.NONCE, // method
-            account))) // receiver of the method call
+            account)).get()) // receiver of the method call
           .getValue();
 
         // we get the chain identifier of the network
@@ -99,7 +99,7 @@ public class Family2 {
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.GET_CHAIN_ID, // method
-            manifest))) // receiver of the method call
+            manifest)).get()) // receiver of the method call
           .getValue();
 
         var gasHelper = GasHelpers.of(node);

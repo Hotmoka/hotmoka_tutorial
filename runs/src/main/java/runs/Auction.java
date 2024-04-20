@@ -104,7 +104,7 @@ public class Auction {
   private final static MethodSignature REVEAL = MethodSignatures.ofVoid
       (BLIND_AUCTION, "reveal",
       StorageTypes.classNamed("io.takamaka.auction.BlindAuction$RevealedBid"));
-  private final static MethodSignature AUCTION_END = MethodSignatures.of
+  private final static MethodSignature AUCTION_END = MethodSignatures.ofNonVoid
       (BLIND_AUCTION, "auctionEnd", PAYABLE_CONTRACT);
 
   //the hashing algorithm used to hide the bids
@@ -216,7 +216,7 @@ public class Auction {
       BigInteger.valueOf(50_000), // gas limit
       takamakaCode, // class path for the execution of the transaction
       MethodSignatures.GET_CHAIN_ID, // method
-      manifest))) // receiver of the method call
+      manifest)).get()) // receiver of the method call
       .getValue();
   }
 
@@ -301,7 +301,7 @@ public class Auction {
       (TransactionRequests.instanceMethodCall
       (signers.get(0), accounts[0], nonceHelper.getNonceOf(accounts[0]),
       chainId, _500_000, panarea(gasHelper.getSafeGasPrice()),
-      classpath, AUCTION_END, auction));
+      classpath, AUCTION_END, auction)).get();
 
     // the winner is normally a StorageReference,
     // but it could be a NullValue if all bids were fake
