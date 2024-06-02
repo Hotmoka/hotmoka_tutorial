@@ -36,9 +36,7 @@ import io.hotmoka.node.TransactionRequests;
 import io.hotmoka.node.api.Node;
 import io.hotmoka.node.api.requests.SignedTransactionRequest;
 import io.hotmoka.node.api.transactions.TransactionReference;
-import io.hotmoka.node.api.values.BigIntegerValue;
 import io.hotmoka.node.api.values.StorageReference;
-import io.hotmoka.node.api.values.StringValue;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
@@ -76,24 +74,24 @@ public class Family {
         // we get the nonce of our account: we use the account itself as caller and
         // an arbitrary nonce (ZERO in the code) since we are running
         // a @View method of the account
-        BigInteger nonce = ((BigIntegerValue) node
+        BigInteger nonce = node
           .runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
             (account, // payer
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.NONCE, // method
-            account)).get()) // receiver of the method call
-          .getValue();
+            account)).get() // receiver of the method call
+          .asBigInteger(__ -> new ClassCastException());
 
         // we get the chain identifier of the network
-        String chainId = ((StringValue) node
+        String chainId = node
           .runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
             (account, // payer
             BigInteger.valueOf(50_000), // gas limit
             takamakaCode, // class path for the execution of the transaction
             MethodSignatures.GET_CHAIN_ID, // method
-            manifest)).get()) // receiver of the method call
-          .getValue();
+            manifest)).get() // receiver of the method call
+          .asString(__ -> new ClassCastException());
 
         var gasHelper = GasHelpers.of(node);
 

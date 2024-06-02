@@ -57,7 +57,7 @@ public class Publisher {
 		.setInitialSupply(SUPPLY)
 		.build();
 
-	try (var original = TendermintNodes.init(config, consensus);
+	try (var original = TendermintNodes.init(config);
          // remove the next line if you want to publish an uninitialized node
          var initialized = InitializedNodes.of(original, consensus, takamakaCodePath);
          var service = NodeServices.of(original, 8001)) {

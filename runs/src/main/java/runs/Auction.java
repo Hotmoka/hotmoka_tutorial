@@ -60,7 +60,6 @@ import io.hotmoka.node.api.transactions.TransactionReference;
 import io.hotmoka.node.api.types.ClassType;
 import io.hotmoka.node.api.values.StorageReference;
 import io.hotmoka.node.api.values.StorageValue;
-import io.hotmoka.node.api.values.StringValue;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
@@ -211,13 +210,13 @@ public class Auction {
 
   private String getChainId() throws Exception {
 	StorageReference manifest = node.getManifest();
-    return ((StringValue) node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
+    return node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
       (accounts[0], // payer
       BigInteger.valueOf(50_000), // gas limit
       takamakaCode, // class path for the execution of the transaction
       MethodSignatures.GET_CHAIN_ID, // method
-      manifest)).get()) // receiver of the method call
-      .getValue();
+      manifest)).get() // receiver of the method call
+        .asString(__ -> new ClassCastException());
   }
 
   private TransactionReference installJar() throws Exception {
