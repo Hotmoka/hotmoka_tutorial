@@ -60,7 +60,7 @@ public class Decorators {
    		.setInitialSupply(SUPPLY)
    		.setPublicKeyOfGamete(keys.getPublic()).build();
 
-	try (var node = DiskNodes.init(config, consensus)) {
+	try (var node = DiskNodes.init(config)) {
       // first view: store the io-takamaka-code jar and create manifest and gamete
 	  var initialized = InitializedNodes.of(node, consensus, takamakaCodePath);
 

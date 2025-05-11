@@ -60,7 +60,6 @@ import io.hotmoka.node.api.transactions.TransactionReference;
 import io.hotmoka.node.api.types.ClassType;
 import io.hotmoka.node.api.values.StorageReference;
 import io.hotmoka.node.api.values.StorageValue;
-import io.hotmoka.node.api.values.StringValue;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
@@ -74,9 +73,9 @@ public class Auction {
   private final static String[] ADDRESSES = new String[3];
   
   static {
-    ADDRESSES[0] = "ecc98397a53d4e9cbab9046caa6e5c96372b6965a6d3626753a2dff9a4f8648d#0";
-    ADDRESSES[1] = "66ac35b5435eb558f1c09cac7b8eed44a17c71b9cb8fecc7a1822f51b8397e08#0";
-    ADDRESSES[2] = "1624f46d236f29470512d64054a734b746a042e03a1110419bd317cf245becf7#0";
+    ADDRESSES[0] = "5f705b7dc5869ae39db3bc80b7cd073c2bb55726706749138d16a4a9d0f01766#0";
+    ADDRESSES[1] = "12441d4a2f52e80f93e726040fbc364b75e7fedbef96887110df678794d791ea#0";
+    ADDRESSES[2] = "eec01b6f22911f76dbd25bda6f850e9af9e8640a4530a46c1909f48b9c7976a3#0";
   }
 
   public final static int NUM_BIDS = 10; // number of bids placed
@@ -211,13 +210,13 @@ public class Auction {
 
   private String getChainId() throws Exception {
 	StorageReference manifest = node.getManifest();
-    return ((StringValue) node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
+    return node.runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
       (accounts[0], // payer
       BigInteger.valueOf(50_000), // gas limit
       takamakaCode, // class path for the execution of the transaction
       MethodSignatures.GET_CHAIN_ID, // method
-      manifest)).get()) // receiver of the method call
-      .getValue();
+      manifest)).get() // receiver of the method call
+        .asString(__ -> new ClassCastException());
   }
 
   private TransactionReference installJar() throws Exception {

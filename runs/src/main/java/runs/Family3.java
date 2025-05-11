@@ -42,10 +42,8 @@ import io.hotmoka.node.api.Node;
 import io.hotmoka.node.api.requests.SignedTransactionRequest;
 import io.hotmoka.node.api.transactions.TransactionReference;
 import io.hotmoka.node.api.types.ClassType;
-import io.hotmoka.node.api.values.BigIntegerValue;
 import io.hotmoka.node.api.values.StorageReference;
 import io.hotmoka.node.api.values.StorageValue;
-import io.hotmoka.node.api.values.StringValue;
 import io.hotmoka.node.remote.RemoteNodes;
 
 /**
@@ -58,7 +56,7 @@ public class Family3 {
 
   // change this with your account's storage reference
   private final static String
-    ADDRESS = "ecc98397a53d4e9cbab9046caa6e5c96372b6965a6d3626753a2dff9a4f8648d#0";
+    ADDRESS = "5f705b7dc5869ae39db3bc80b7cd073c2bb55726706749138d16a4a9d0f01766#0";
 
   private final static ClassType PERSON = StorageTypes.classNamed("io.takamaka.family.Person");
 
@@ -85,24 +83,24 @@ public class Family3 {
         // we get the nonce of our account: we use the account itself as caller and
         // an arbitrary nonce (ZERO in the code) since we are running
         // a @View method of the account
-        BigInteger nonce = ((BigIntegerValue) node
+        BigInteger nonce = node
           .runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
             (account, // payer
-            BigInteger.valueOf(50_000), // gas limit
-            takamakaCode, // class path for the execution of the transaction
-            MethodSignatures.NONCE, // method
-            account)).get()) // receiver of the method call
-          .getValue();
+             BigInteger.valueOf(50_000), // gas limit
+             takamakaCode, // class path for the execution of the transaction
+             MethodSignatures.NONCE, // method
+             account)).get() // receiver of the method call
+           .asBigInteger(__ -> new ClassCastException());
 
         // we get the chain identifier of the network
-        String chainId = ((StringValue) node
-          .runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
-            (account, // payer
-            BigInteger.valueOf(50_000), // gas limit
-            takamakaCode, // class path for the execution of the transaction
-            MethodSignatures.GET_CHAIN_ID, // method
-            manifest)).get()) // receiver of the method call
-          .getValue();
+        String chainId = node
+           .runInstanceMethodCallTransaction(TransactionRequests.instanceViewMethodCall
+             (account, // payer
+             BigInteger.valueOf(50_000), // gas limit
+             takamakaCode, // class path for the execution of the transaction
+             MethodSignatures.GET_CHAIN_ID, // method
+             manifest)).get() // receiver of the method call
+           .asString(__ -> new ClassCastException());
 
         var gasHelper = GasHelpers.of(node);
 

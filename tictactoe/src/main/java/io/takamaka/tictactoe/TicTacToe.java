@@ -28,22 +28,23 @@ import io.takamaka.code.lang.Contract;
 import io.takamaka.code.lang.FromContract;
 import io.takamaka.code.lang.Payable;
 import io.takamaka.code.lang.PayableContract;
+import io.takamaka.code.lang.Storage;
 import io.takamaka.code.lang.View;
 import io.takamaka.code.util.StorageArray;
 import io.takamaka.code.util.StorageTreeArray;
 
 public class TicTacToe extends Contract {
 
-  public enum Tile {
-    EMPTY, CROSS, CIRCLE;
+  public class Tile extends Storage {
+    private final char c;
+
+    private Tile(char c) {
+      this.c = c;
+    }
 
     @Override
     public String toString() {
-      switch (this) {
-      case EMPTY: return " ";
-      case CROSS: return "X";
-      default: return "O";
-      }
+      return String.valueOf(c);
     }
 
     private Tile nextTurn() {
@@ -51,9 +52,13 @@ public class TicTacToe extends Contract {
     }
   }
 
-  private final StorageArray<Tile> board = new StorageTreeArray<>(9, Tile.EMPTY);
+  private final Tile EMPTY = new Tile(' ');
+  private final Tile CROSS = new Tile('X');
+  private final Tile CIRCLE = new Tile('O');
+
+  private final StorageArray<Tile> board = new StorageTreeArray<>(9, EMPTY);
   private PayableContract crossPlayer, circlePlayer;
-  private Tile turn = Tile.CROSS; // cross plays first
+  private Tile turn = CROSS; // cross plays first
   private boolean gameOver;
 
   public @View Tile at(int x, int y) {
@@ -72,11 +77,11 @@ public class TicTacToe extends Contract {
     require(!gameOver, "the game is over");
     require(1 <= x && x <= 3 && 1 <= y && y <= 3,
       "coordinates must be between 1 and 3");
-    require(at(x, y) == Tile.EMPTY, "the selected tile is not empty");
+    require(at(x, y) == EMPTY, "the selected tile is not empty");
 
     var player = (PayableContract) caller();
 
-    if (turn == Tile.CROSS)
+    if (turn == CROSS)
       if (crossPlayer == null)
         crossPlayer = player;
       else
