@@ -52,7 +52,7 @@ public class Decorators {
     // the path of the user jar to install
     var familyPath = Paths.get("../family/target/family-0.0.1.jar");
 
-    // create a key pair for the gamete and compute the Base64-encoding of its public key
+    // create a key pair for the gamete
     var signature = SignatureAlgorithms.ed25519();
 	var entropy = Entropies.random();
 	KeyPair keys = entropy.keys("password", signature);
